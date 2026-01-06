@@ -65,7 +65,7 @@ main {
     box-shadow: 50px 50px 10px rgba(0, 0, 0, 0.5);
     display: grid;
     grid-template-columns: 2fr 1fr;
-    height: 1280px;
+    height: 100%;
     
 }
 
@@ -194,6 +194,18 @@ footer {
     background-color: rgb(189, 148, 154);
     box-shadow: -3px 0px 10px rgba(0, 0, 0, 0.5);
     
+}
+
+.titoCursor {
+
+    cursor: url(https://cur.cursors-4u.net/holidays/hol-4/hol401.cur), auto !important;
+
+}
+
+.trainCursor {
+
+    cursor: url(https://cur.cursors-4u.net/mechanics/mec-5/mec487.cur), auto !important;
+
 }
 
 .textFooter {
