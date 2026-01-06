@@ -1,4 +1,4 @@
-/*      CSS for screens narrower than 640 pixels      */
+/*      CSS for screens NARROWER than 640 pixels      */
 
 
 
@@ -26,14 +26,6 @@ img {
 
 }
 
-/*
-body {
-
-    background-color: black;
-
-}
-*/
-
 header, main, footer {
 
     overflow: hidden;
@@ -45,8 +37,10 @@ header {
     background-color: red;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
     display: flex;
-    justify-content: space-between;
-    height: 2rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: auto;
     position: sticky;
     top: 0;
     z-index: 1;
@@ -62,9 +56,7 @@ nav {
 main {
     
     background-color: green;
-    box-shadow: 50px 50px 10px rgba(0, 0, 0, 0.5);
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    display: flex;
     
 }
 
@@ -98,12 +90,12 @@ footer {
 
 .logoHeader {
     
-    box-shadow: 5px 0px 10px rgba(0, 0, 0, 0.3);
-    height: auto;
+    display: flex;
+    height: 50px;
     object-fit: contain;
     cursor: url(https://cur.cursors-4u.net/symbols/sym-1/sym49.cur), auto;
-    border-bottom-right-radius: 15%;
-    border-top-right-radius: 15%;
+    border-radius: 0;
+    box-shadow: none; /* Ovo podesiti kada se završi izgled Navigacije */
     
 }
 
@@ -111,16 +103,25 @@ footer {
     
     background-color: coral;
     display: flex;
+    justify-content: space-evenly;
     align-items: center;
+    height: 2rem;
     width: 100%;
+    overflow: hidden;
     
 }
 
 .titleHeader {
     
     background-color: rgb(98, 58, 136);
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    height: 100%;
+    min-width: 4rem;
     font-size: 1rem;
-    padding: 1rem 0.5rem;
+    padding: 0;
+    overflow: hidden;
 
 }
 
@@ -148,16 +149,42 @@ footer {
     border-radius: 30%;
     text-decoration: none;
     
-}       
+}
+
+.burgerMenuVis {
+
+    visibility: visible;
+
+}
+
+.burgerMenu {
+
+    
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    width: fit-content;
+    padding: 0 0.5rem;
+
+}
+
+.linesBurgerMenu {
+
+    width: 2rem;
+    height: 0.2rem;
+    background-color: black;
+    margin: 0.3rem 0;
+
+}
 
 .gifHeader {
     
-    box-shadow: -5px 0px 10px rgba(0, 0, 0, 0.3);
-    height: auto;
+    display: flex;
+    height: 50px;
     object-fit: contain;
     cursor: grabbing;
-    border-bottom-left-radius: 15%;
-    border-top-left-radius: 15%;
+    border-radius: 0;
+    box-shadow: none; /* Ovo podesiti kada se završi izgled Navigacije */
     
 }
 
@@ -177,8 +204,37 @@ footer {
 .rightContMain {
     
     background-color: rgb(189, 148, 154);
+    position: absolute;
+    left: calc(100% - 50px);
     box-shadow: -3px 0px 10px rgba(0, 0, 0, 0.5);
     
+}
+
+.rightContMain:hover {
+
+    left: 50px;
+    height: 100%;
+
+}
+
+.rightContMain::before {
+
+    font-size: 0.5rem;
+    font-weight: bold;
+    color: red;
+    border: 1px solid red;
+    content: "Click Me";
+
+}
+
+.rightContMain:hover::before {
+
+    font-size: 1rem;
+    font-weight: bold;
+    color: green;
+    border: 1px solid green;
+    content: "Click left";
+
 }
 
 .textFooter {
@@ -201,94 +257,6 @@ footer {
 
 
 /* MEDIA */
-
-@media (max-width: 640px) {
-
-    header {
-
-        flex-direction: column;
-        justify-content: center;
-        height: auto;
-
-    }
-    
-    main {
-        
-        grid-template-columns: none;
-        display: flex;      
-        box-shadow: none;
-
-    }
-
-    .logoHeader, .gifHeader {
-
-        height: 50px;
-        display: flex;
-        box-shadow: none;
-        
-    }
-    
-    .centerHeader {
-        
-        height: 2rem;
-        justify-content: space-evenly;
-        overflow: hidden;
-        
-    }
-    
-    .titleHeader {
-        
-        height: 100%;
-        min-width: 4rem;
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
-        padding: 0;
-        overflow: hidden;
-        
-    }
-    
-    .centerNav {
-        
-        display: flex;
-
-    }
-
-    .rightContMain {
-
-        position: absolute;
-        left: calc(100% - 50px);
-
-    }
-
-    .rightContMain:hover {
-
-        left: 50px;
-        height: 100%;
-
-    }
-
-    .rightContMain::before {
-
-        font-size: 0.5rem;
-        font-weight: bold;
-        color: red;
-        border: 1px solid red;
-        content: "Click Me";
-
-    }
-
-    .rightContMain:hover::before {
-
-        font-size: 1rem;
-        font-weight: bold;
-        color: red;
-        border: 1px solid red;
-        content: "Click Me";
-
-    }
-
-}
 
 @media (max-width: 192px) {
 

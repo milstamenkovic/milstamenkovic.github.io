@@ -1,4 +1,4 @@
-/*      CSS for screens wider than 640 pixels       */
+/*      CSS for screens WIDER than 640 pixels       */
 
 
 
@@ -139,9 +139,16 @@ footer {
     display: flex;
     list-style: none;
     justify-content: space-evenly;
+    /*transform: translateX(640px);*/
     
 }
+/*
+.menuCenterNav.active {
 
+    transform: translateX(0);
+
+}
+*/
 .buttonMenuCenterNav {
     
     background-color: rgb(65, 138, 187);
@@ -151,6 +158,12 @@ footer {
     text-decoration: none;
     
 }       
+
+.burgerMenuVis {
+
+    visibility: hidden;
+
+}
 
 .gifHeader {
     
