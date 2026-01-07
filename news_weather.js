@@ -11,13 +11,25 @@ const weatherUpdated = document.getElementById('weather-updated');
 async function fetchNews() {
   try {
     const query = encodeURIComponent('Srbija');
-    const rssUrl = `https://news.google.com/rss/search?q=${query}&hl=sr&gl=RS&ceid=RS:sr`;
-    const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`;
-    const res = await fetch(proxy);
-    if (!res.ok) throw new Error('Не могу да преузмем вести');
-    const text = await res.text();
-    const doc = new DOMParser().parseFromString(text, 'application/xml');
-    const items = Array.from(doc.querySelectorAll('item')).slice(0, 10);
+    const googleUrl = `https://news.google.com/rss/search?q=${query}&hl=sr&gl=RS&ceid=RS:sr`;
+    const nasloviUrl = 'https://naslovi.net/rss';
+    const proxyFor = url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+
+    // Try naslovi.net first (preferred source). If it fails or has no items, fall back to Google News.
+    let res = await fetch(proxyFor(nasloviUrl));
+    let text = await res.text();
+    let doc = new DOMParser().parseFromString(text, 'application/xml');
+    let items = Array.from(doc.querySelectorAll('item'));
+    if (!items.length) {
+      res = await fetch(proxyFor(googleUrl));
+      if (!res.ok) throw new Error('Не могу да преузмем вести');
+      text = await res.text();
+      doc = new DOMParser().parseFromString(text, 'application/xml');
+      items = Array.from(doc.querySelectorAll('item')).slice(0, 10);
+    } else {
+      // keep up to 10 from naslovi then choose top5 by date
+      items = items.slice(0, 10);
+    }
     // Normalize items with date and description, then pick top 5 by date.
     const parsed = items.map(it => {
       const title = it.querySelector('title')?.textContent || '';
