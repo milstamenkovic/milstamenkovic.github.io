@@ -1,35 +1,38 @@
 <!doctype html>
-<html lang="en">
+<html lang="sr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Serbia — Top News & Weather</title>
+  <title>Србија — Вести и Време</title>
   <link rel="stylesheet" href="news_weather.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap&subset=cyrillic" rel="stylesheet">
 </head>
 <body>
   <main>
-    <h1>Serbia — Top News & Weather</h1>
+    <h1>Вести и Време — Србија</h1>
 
     <section id="news-section">
-      <h2>Top 5 Latest News</h2>
+      <h2>5 најновијих вести</h2>
       <div id="news-updated" class="meta">—</div>
       <ul id="news-list"></ul>
-      <div class="small">News auto-refreshes every 10 minutes.</div>
+      <div class="small">Вести се аутоматски освежавају на сваких 10 минута.</div>
     </section>
 
     <section id="weather-section">
-      <h2>Current Weather (Belgrade, Serbia)</h2>
+      <h2>Тренутно време (Ћуприја, Србија)</h2>
       <div id="weather-updated" class="meta">—</div>
       <div id="weather">
         <div id="temp">—</div>
-        <div id="desc">—</div>
-        <div id="wind">—</div>
+        <div>
+          <div id="desc">—</div>
+          <div id="wind">—</div>
+        </div>
       </div>
-      <div class="small">Weather auto-refreshes every 5 minutes.</div>
+      <div class="small">Време се аутоматски освежава на сваких 5 минута.</div>
     </section>
 
     <footer>
-      <small>Sources: Google News (RSS via allorigins proxy) and Open-Meteo.</small>
+      <small>Извори: Google News (RSS преко allorigins) и Open-Meteo.</small>
     </footer>
   </main>
 

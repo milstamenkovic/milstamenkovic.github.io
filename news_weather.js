@@ -1,5 +1,5 @@
-// Fetch top 5 news about Serbia via Google News RSS (proxied) and current weather via Open-Meteo.
-// News refresh: 10 minutes. Weather refresh: 5 minutes.
+// Преузимање 5 најновијих вести на српском (Cyrillic видљивост) и тренутног времена за Ћуприју.
+// Освежавање: вести сваких 10 минута, време сваких 5.
 
 const newsList = document.getElementById('news-list');
 const newsUpdated = document.getElementById('news-updated');
@@ -10,57 +10,79 @@ const weatherUpdated = document.getElementById('weather-updated');
 
 async function fetchNews() {
   try {
-    const query = encodeURIComponent('Serbia');
-    const rssUrl = `https://news.google.com/rss/search?q=${query}&hl=en-US&gl=RS&ceid=RS:en`;
-    // Use allorigins proxy to avoid CORS issues
+    const query = encodeURIComponent('Srbija');
+    const rssUrl = `https://news.google.com/rss/search?q=${query}&hl=sr&gl=RS&ceid=RS:sr`;
     const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`;
     const res = await fetch(proxy);
-    if (!res.ok) throw new Error('Failed to fetch news');
+    if (!res.ok) throw new Error('Не могу да преузмем вести');
     const text = await res.text();
     const doc = new DOMParser().parseFromString(text, 'application/xml');
-    const items = Array.from(doc.querySelectorAll('item')).slice(0, 5);
-    newsList.innerHTML = '';
-    items.forEach(it => {
-      const title = it.querySelector('title')?.textContent || 'No title';
+    const items = Array.from(doc.querySelectorAll('item')).slice(0, 10);
+    // Normalize items with date and description, then pick top 5 by date.
+    const parsed = items.map(it => {
+      const title = it.querySelector('title')?.textContent || '';
       const link = it.querySelector('link')?.textContent || '#';
-      const pubDate = it.querySelector('pubDate')?.textContent || '';
+      const desc = it.querySelector('description')?.textContent || '';
+      const pub = it.querySelector('pubDate')?.textContent || '';
+      const date = pub ? new Date(pub) : new Date();
+      return {title, link, desc, date};
+    });
+    parsed.sort((a,b)=>b.date - a.date);
+    const top = parsed.slice(0,5);
+    newsList.innerHTML = '';
+    top.forEach(item => {
       const li = document.createElement('li');
       const a = document.createElement('a');
-      a.href = link;
+      a.href = item.link;
       a.target = '_blank';
       a.rel = 'noopener';
-      a.textContent = title;
+      a.textContent = item.title;
       const meta = document.createElement('div');
       meta.className = 'item-meta';
-      meta.textContent = pubDate;
+      meta.textContent = item.date.toLocaleString('sr-RS');
+      const desc = document.createElement('div');
+      desc.className = 'desc';
+      desc.innerHTML = sanitizeSnippet(item.desc);
       li.appendChild(a);
       li.appendChild(meta);
+      li.appendChild(desc);
       newsList.appendChild(li);
     });
-    newsUpdated.textContent = `Last updated: ${new Date().toLocaleString()}`;
+    newsUpdated.textContent = `Ажурирано: ${new Date().toLocaleString('sr-RS')}`;
   } catch (err) {
-    newsList.innerHTML = '<li class="error">Could not load news.</li>';
+    newsList.innerHTML = '<li class="error">Није могуће учитати вести.</li>';
     console.error(err);
   }
 }
 
-// Open-Meteo fetch for Belgrade coordinates
+function sanitizeSnippet(html) {
+  // Very small sanitizer: strip <img> and scripts but allow basic text/links.
+  try {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    Array.from(doc.querySelectorAll('img,script')).forEach(n=>n.remove());
+    return doc.body.innerHTML;
+  } catch(e) {
+    return html.replace(/<[^>]+>/g,'');
+  }
+}
+
+// Open-Meteo for Ćуприја coordinates
 async function fetchWeather() {
   try {
-    const lat = 44.7872, lon = 20.4579;
+    const lat = 43.9181, lon = 21.3486; // Ćuprija
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Europe%2FBelgrade`;
     const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to fetch weather');
+    if (!res.ok) throw new Error('Не могу да преузмем време');
     const data = await res.json();
     const cw = data.current_weather;
-    if (!cw) throw new Error('No current weather');
-    tempEl.textContent = `${cw.temperature}°C`;
+    if (!cw) throw new Error('Нема тренутних података о времену');
+    tempEl.textContent = `${cw.temperature} °C`;
     descEl.textContent = weatherCodeToText(cw.weathercode);
-    windEl.textContent = `Wind: ${cw.windspeed} km/h (${cw.winddirection}°)`;
-    weatherUpdated.textContent = `Last updated: ${new Date(cw.time).toLocaleString()}`;
+    windEl.textContent = `Ветар: ${cw.windspeed} km/h (${cw.winddirection}°)`;
+    weatherUpdated.textContent = `Ажурирано: ${new Date(cw.time).toLocaleString('sr-RS')}`;
   } catch (err) {
     tempEl.textContent = '—';
-    descEl.textContent = 'Could not load weather.';
+    descEl.textContent = 'Не могу да учитам време.';
     windEl.textContent = '';
     console.error(err);
   }
@@ -68,24 +90,24 @@ async function fetchWeather() {
 
 function weatherCodeToText(code) {
   const map = {
-    0: 'Clear sky',
-    1: 'Mainly clear',
-    2: 'Partly cloudy',
-    3: 'Overcast',
-    45: 'Fog',
-    48: 'Depositing rime fog',
-    51: 'Drizzle: Light',
-    53: 'Drizzle: Moderate',
-    55: 'Drizzle: Dense',
-    61: 'Rain: Slight',
-    63: 'Rain: Moderate',
-    65: 'Rain: Heavy',
-    71: 'Snow: Slight',
-    73: 'Snow: Moderate',
-    75: 'Snow: Heavy',
-    95: 'Thunderstorm',
+    0: 'Ведро',
+    1: 'Претежно ведро',
+    2: 'Делимично облачно',
+    3: 'Облачно',
+    45: 'Магла',
+    48: 'Мрљава магла',
+    51: 'Исцедица: благо',
+    53: 'Исцедица: умерено',
+    55: 'Исцедица: густо',
+    61: 'Киша: мало',
+    63: 'Киша: умерено',
+    65: 'Киша: јако',
+    71: 'Снег: мало',
+    73: 'Снег: умерено',
+    75: 'Снег: много',
+    95: 'Олуја',
   };
-  return map[code] || `Weather code ${code}`;
+  return map[code] || `Код: ${code}`;
 }
 
 // Initial fetch
