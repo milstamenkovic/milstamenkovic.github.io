@@ -20,6 +20,8 @@
     .small{font-size:0.9rem;color:var(--muted)}
     /* Hide the iframe visually but keep it in DOM for playback */
     #ytplayer{position:fixed;left:-9999px;width:1px;height:1px;opacity:0}
+    /* Big red play styling for emphasis */
+    .btn.big-red{background:#d32f2f;padding:20px 24px;font-size:1.25rem;border-radius:14px}
     @media (max-width:740px){.hero{grid-template-columns:1fr}}
   </style>
 </head>
@@ -27,36 +29,35 @@
   <div class="wrap">
     <header>
       <div>
-        <h1>World News — Stream</h1>
-        <div class="meta">Short updates and an ambient audio stream</div>
+        <h1>Светске вести — Стрим</h1>
+        <div class="meta">Кратке вести и позадински аудио</div>
       </div>
-      <div class="small">Updated: January 7, 2026</div>
+      <div class="small">Ажурирано: 7. јануар 2026.</div>
     </header>
 
     <div class="hero">
       <div>
         <section class="card">
-          <h2 style="margin-top:0">Top Stories (brief)</h2>
-          <p>Global markets, climate response, technology regulation, and humanitarian developments remain central to headlines worldwide. This page provides a short digest while an ambient audio stream plays in the background like a radio.</p>
+          <h2 style="margin-top:0">Најважније вести (укратко)</h2>
+          <p>Глобална тржишта, реакције на климатске промене, регулација технологије и хуманитарни догађаји доминирају насловима. Ова страница даје кратак преглед уз позадински аудио као радио.</p>
           <ul>
-            <li>Markets and economy: ongoing shifts after recent policy changes.</li>
-            <li>Environment: international climate talks and extreme weather responses.</li>
-            <li>Technology: AI policy and regulation continue to be debated.</li>
-            <li>Humanitarian: aid and recovery efforts in affected regions.</li>
+            <li>Тржишта и економија: помањкања након најновијих политика.</li>
+            <li>Животна средина: међународни разговори о клими и хитни одговори.</li>
+            <li>Технологија: дебате о правилима за вештачку интелигенцију.</li>
+            <li>Хуманитарно: напори помоћи и опоравка у погођеним регионима.</li>
           </ul>
-          <p class="small">This is a simple demo page combining short news copy with a background audio stream sourced from a YouTube link.</p>
+          <p class="small">Ово је демонстрација која спаја кратке вести са позадинским аудио стримом са YouTube-а.</p>
         </section>
       </div>
 
       <aside>
         <div class="card controls">
-          <div class="small">Background audio source</div>
+          <div class="small">Извор аудио стрима</div>
           <div class="small">YouTube ID: <strong>Dx8sf9dNQWQ</strong></div>
-          <button id="playBtn" class="btn">Play</button>
-          <button id="pauseBtn" class="btn" disabled>Pause</button>
-          <button id="muteBtn" class="btn">Mute</button>
-          <div class="small" id="status">Status: idle</div>
-          <div class="small" style="margin-top:8px">Note: Some browsers block autoplay with sound. If audio doesn't start automatically, press Play.</div>
+          <button id="playBtn" class="btn" style="background:#d32f2f;padding:18px 20px;font-size:1.05rem;border-radius:12px;font-size:1.1rem">ПЛЕЈ</button>
+          <button id="pauseBtn" class="btn" disabled style="background:#444;color:#fff">ПАУЗА</button>
+          <div class="small" id="status">Статус: у миру</div>
+          <div class="small" style="margin-top:8px;color:#ffd1d1">Притисните велики црвени ПЛЕЈ тастер да покренете звук из видеа.</div>
         </div>
       </aside>
     </div>
@@ -80,7 +81,7 @@
         width: '1',
         videoId: 'Dx8sf9dNQWQ',
         playerVars: {
-          autoplay: 1,
+          autoplay: 0,
           controls: 0,
           rel: 0,
           modestbranding: 1,
@@ -94,40 +95,43 @@
       });
     }
 
-    function updateStatus(t){document.getElementById('status').textContent = 'Status: '+t}
+    function updateStatus(t){document.getElementById('status').textContent = 'Статус: '+t}
 
     function onPlayerReady(e){
-      // Best-effort: start muted (increases chance autoplay is allowed), then try to unmute.
       try{
         var ifr = player.getIframe();
         if(ifr && ifr.setAttribute) ifr.setAttribute('allow', 'autoplay; encrypted-media');
-        e.target.mute();
-        e.target.playVideo();
-        updateStatus('playing (muted)');
-      } catch(err){ updateStatus('ready'); }
-
+      }catch(err){}
+      updateStatus('спремно');
       document.getElementById('playBtn').disabled = false;
-
-      // Attempt to unmute after a short delay (may still be blocked without user gesture)
-      setTimeout(function(){ try{ e.target.unMute(); updateStatus('playing (unmute attempted)'); document.getElementById('playBtn').disabled=true; document.getElementById('pauseBtn').disabled=false; }catch(err){} }, 600);
     }
 
     function onPlayerStateChange(e){
       var st = e.data;
-      if(st === YT.PlayerState.PLAYING) updateStatus('playing');
-      else if(st === YT.PlayerState.PAUSED) updateStatus('paused');
-      else if(st === YT.PlayerState.ENDED) updateStatus('ended');
+      if(st === YT.PlayerState.PLAYING) updateStatus('репродукује');
+      else if(st === YT.PlayerState.PAUSED) updateStatus('паузирано');
+      else if(st === YT.PlayerState.ENDED) updateStatus('завршено');
     }
 
-    // Controls
+    // Controls: require user gesture to start audible playback
     document.addEventListener('DOMContentLoaded', function(){
       var play = document.getElementById('playBtn');
       var pause = document.getElementById('pauseBtn');
-      var mute = document.getElementById('muteBtn');
 
-      play.addEventListener('click', function(){ if(player && player.playVideo) { player.playVideo(); try{ player.unMute(); }catch(e){} play.disabled=true; pause.disabled=false; updateStatus('playing'); } });
-      pause.addEventListener('click', function(){ if(player && player.pauseVideo){ player.pauseVideo(); pause.disabled=true; play.disabled=false; updateStatus('paused'); } });
-      mute.addEventListener('click', function(){ if(player && player.isMuted){ if(player.isMuted()) { player.unMute(); mute.textContent='Mute'; } else { player.mute(); mute.textContent='Unmute'; } } });
+      play.addEventListener('click', function(){
+        if(player && player.playVideo){
+          try{ player.unMute(); }catch(e){}
+          player.playVideo();
+          play.disabled=true; pause.disabled=false; updateStatus('репродукује');
+        }
+      });
+
+      pause.addEventListener('click', function(){
+        if(player && player.pauseVideo){
+          player.pauseVideo();
+          pause.disabled=true; play.disabled=false; updateStatus('паузирано');
+        }
+      });
     });
   </script>
 </body>
