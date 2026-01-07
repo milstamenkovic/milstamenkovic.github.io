@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="sr-Cyrl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Милан Стаменковић — Писац и режисер</title>
+  <link rel="stylesheet" href="css/author_style_v2.css">
+</head>
+<body>
+  <div id="top-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="container-wide">
+      <a class="brand" href="index.html">Милан Стаменковић</a>
+      <nav class="nav">
+        <a href="#about">О мени</a>
+        <a href="http://youtube.com/@milstamenkovic" target="_blank" rel="noopener">Радови</a>
+        <a href="#timeline">Хронологија</a>
+        <a href="#contact">Контакт</a>
+      </nav>
+      <div class="controls">
+        <button id="theme-toggle" aria-pressed="false">Тема</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sticky video widget (right side) - click-to-play thumbnail for reliable autoplay after user interaction -->
+  <div class="video-widget" aria-hidden="false" data-video-id="9XWmXY9u7CE">
+    <div class="video-thumb" role="button" tabindex="0" aria-label="Пустите видео">
+      <img src="https://i.ytimg.com/vi/9XWmXY9u7CE/hqdefault.jpg" alt="Видео — Сенка реке">
+      <div class="play-overlay">▶</div>
+    </div>
+    <button id="video-toggle" class="video-toggle" aria-pressed="false" title="Затвори видео">✕</button>
+  </div>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-inner">
+        <h1>Приче које остају са вама</h1>
+        <p class="lead">Романи и филмови који проучавају памћење, самота и простор.</p>
+        <p class="ctas">
+          <button id="open-excerpt">Прочитај одломак</button>
+          <a class="btn ghost" href="#works">Погледај радове</a>
+        </p>
+      </div>
+    </section>
+
+    <section id="about" class="panel">
+      <h2>О мени</h2>
+      <p>Милан Стаменковић пише прозу и режира филмске приче које са пажњом граде атмосферу и лик. На овој страници налазе се одабрани романи, филмови, хронологија пројеката и примери за читалачку или професионалну употребу.</p>
+    </section>
+
+    <section id="works" class="panel">
+      <div class="panel-head">
+        <h2>Изабрани радови</h2>
+        <div class="filters">
+          <button class="filter active" data-filter="all">Све</button>
+          <button class="filter" data-filter="book">Књиге</button>
+          <button class="filter" data-filter="film">Филм</button>
+        </div>
+      </div>
+      <div class="grid" id="works-grid">
+        <article class="card" data-type="book">
+          <h3>Сенка реке</h3>
+          <p class="meta">Роман — 2021</p>
+          <p class="excerpt">Река чува успомене и тихе губитке.</p>
+          <p><button class="view-sample">Пример</button></p>
+        </article>
+        <article class="card" data-type="film">
+          <h3>Последње светло</h3>
+          <p class="meta">Кратки филм — 2019</p>
+          <p class="excerpt">Прича о два детета и месту које их обликује.</p>
+          <p><button class="view-sample">Погледај</button></p>
+        </article>
+        <article class="card" data-type="book">
+          <h3>Тихи градови</h3>
+          <p class="meta">Роман — 2016</p>
+          <p class="excerpt">Писма и откуцаји градске тишине.</p>
+          <p><button class="view-sample">Пример</button></p>
+        </article>
+      </div>
+    </section>
+
+    <section id="timeline" class="panel timeline-panel">
+      <h2>Хронологија</h2>
+      <div class="timeline">
+        <button class="tl-nav" id="tl-prev">◀</button>
+        <div class="tl-view">
+          <div class="tl-item" data-year="2016"><strong>2016</strong><p>Тихи градови — Роман</p></div>
+          <div class="tl-item" data-year="2019"><strong>2019</strong><p>Последње светло — Кратки филм</p></div>
+          <div class="tl-item" data-year="2021"><strong>2021</strong><p>Сенка реке — Роман</p></div>
+        </div>
+        <button class="tl-nav" id="tl-next">▶</button>
+      </div>
+    </section>
+
+    <section id="newsletter" class="panel">
+      <h2>Билтен</h2>
+      <p>Прими повремене вести о новим издањима и пројекцијама.</p>
+      <form id="newsletter-form" class="newsletter">
+        <input name="email" type="email" placeholder="ваш@адреса.ком" required>
+        <button type="submit">Пријави се</button>
+      </form>
+      <p class="muted">Нема спама — морате ли онемогућити пријем у било ком тренутку. Ово је демо формулар.</p>
+    </section>
+
+    <section id="contact" class="panel">
+      <h2>Контакт</h2>
+      <p>За сарадњу, представљање или медије: <a href="mailto:info@example.com">info@example.com</a></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>© Милан Стаменковић — <a href="about/about.html">О мени</a></small>
+  </footer>
+
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <button id="modal-close" class="modal-close">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="javascript/author_v2.js"></script>
+</body>
+</html>
