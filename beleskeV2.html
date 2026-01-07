@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="sr-Cyrl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Белешке V2 — Душан Стаменковић</title>
+  <style>
+    :root{--bg:#f6f8fb;--card:#ffffff;--muted:#6b7280;--accent:#1e40af}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;background:var(--bg);color:#0f1724}
+    .wrap{max-width:1100px;margin:28px auto;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between}
+    h1{margin:0;font-size:1.5rem}
+    .meta{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:20px;margin-top:18px}
+    .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(15,23,36,0.06)}
+    .video-wrap{position:relative;background:#000;border-radius:8px;overflow:hidden;padding-top:56.25%}
+    #ytPlayerRoot{position:absolute;top:0;left:0;width:100%;height:100%}
+    .thumbs{display:flex;gap:8px;overflow:auto;padding:8px}
+    .thumb{width:140px;flex:0 0 140px;cursor:pointer;border-radius:6px;height:78.75px;background:#000;display:flex;align-items:center;justify-content:center}
+    .thumb img{width:100%;height:100%;object-fit:contain;border-radius:6px}
+    .thumb.active{outline:3px solid #ef4444}
+    .controls{display:flex;gap:8px;align-items:center;margin-top:8px}
+    .btn{background:var(--accent);color:#fff;padding:10px 12px;border-radius:8px;border:none;cursor:pointer}
+    .btn.red{background:#ef4444}
+    .note{color:var(--muted);font-size:0.95rem}
+
+    /* Modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);z-index:80}
+    .modal.open{display:flex}
+    .modal-box{width:90%;max-width:1100px;background:#fff;border-radius:10px;padding:12px}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .modal-content{display:grid;grid-template-columns:1fr 320px;gap:12px}
+    .modal-thumbs{max-height:60vh;overflow:auto}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}.modal-content{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Белешке V2</h1>
+        <div class="meta">Преглед видео записа: Душан Стаменковић</div>
+      </div>
+      <div>
+        <button id="openChannelModal" class="btn red">Погледај цео канал</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main>
+        <section class="card">
+          <h2 style="margin-top:0">Кратак резиме</h2>
+          <p class="note">Ако желите стварни садржај странице "Белешке", залепите текст који желите да обрадим. До тада, овде је кратак опис и плејлист са канала.</p>
+        </section>
+      </main>
+
+      <aside>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Плејлист</strong><div class="note">Канал: Душан Стаменковић</div></div>
+            <div class="note">ћирилица</div>
+          </div>
+
+          <div class="video-wrap" id="videoWrap">
+            <div id="ytPlayerRoot"></div>
+          </div>
+
+          <div class="controls">
+            <button id="prevBtn" class="btn">Претходни</button>
+            <button id="nextBtn" class="btn">Следећи</button>
+            <div style="flex:1"></div>
+            <button id="openChannel" class="btn">Отвори канал</button>
+          </div>
+
+          <div class="thumbs" id="thumbs" style="margin-top:10px"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Channel modal: shows a larger player plus full channel playlist -->
+  <div id="channelModal" class="modal" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <strong>Цео канал — Душан Стаменковић</strong>
+        <div>
+          <button id="closeModal" class="btn">Затвори</button>
+        </div>
+      </div>
+      <div class="modal-content">
+        <div>
+          <div style="position:relative;padding-top:56.25%">
+            <div id="channelPlayerRoot" style="position:absolute;top:0;left:0;width:100%;height:100%"></div>
+          </div>
+        </div>
+        <aside class="modal-thumbs">
+          <div id="channelThumbs"></div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var channelId = 'UCgs-YbaXKRMKnNgcx-rduIQ';
+    var uploadsPlaylistId = 'UU' + channelId.substring(2);
+
+    var tag = document.createElement('script'); tag.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(tag);
+
+    var player, channelPlayer;
+    function onYouTubeIframeAPIReady(){
+      player = new YT.Player('ytPlayerRoot',{
+        height: '100%', width: '100%',
+        playerVars:{listType:'playlist',list:uploadsPlaylistId,controls:1,modestbranding:1,rel:0},
+        events:{'onReady':onPlayerReady,'onStateChange':onPlayerStateChange}
+      });
+
+      // create channel modal player but do not autoplay
+      channelPlayer = new YT.Player('channelPlayerRoot',{
+        height:'100%',width:'100%',
+        playerVars:{listType:'playlist',list:uploadsPlaylistId,controls:1,modestbranding:1,rel:0},
+        events:{'onReady':onChannelReady,'onStateChange':onChannelState}
+      });
+    }
+
+    function onPlayerReady(){ buildThumbnails(); }
+    function onChannelReady(){ buildChannelThumbnails(); }
+    function onPlayerStateChange(){ highlightActiveThumb(); }
+    function onChannelState(){ highlightChannelThumb(); }
+
+    function buildThumbnails(){ try{ var list = player.getPlaylist(); var tcon=document.getElementById('thumbs'); tcon.innerHTML=''; if(!list||list.length===0){ tcon.innerHTML='<div class="note">Чекајте...</div>'; return;} list.forEach(function(v,i){ var d=document.createElement('div'); d.className='thumb'; var img=document.createElement('img'); img.src='https://i.ytimg.com/vi/'+v+'/mqdefault.jpg'; d.appendChild(img); d.addEventListener('click',function(){ player.playVideoAt(i); highlightActiveThumb(); }); tcon.appendChild(d); }); highlightActiveThumb(); }catch(e){console.warn(e);} }
+
+    function buildChannelThumbnails(){ try{ var list = channelPlayer.getPlaylist(); var tcon=document.getElementById('channelThumbs'); tcon.innerHTML=''; if(!list||list.length===0){ tcon.innerHTML='<div class="note">Чекајте...</div>'; return;} list.forEach(function(v,i){ var div=document.createElement('div'); div.className='thumb'; div.style.marginBottom='8px'; var img=document.createElement('img'); img.src='https://i.ytimg.com/vi/'+v+'/mqdefault.jpg'; div.appendChild(img); div.addEventListener('click',function(){ channelPlayer.playVideoAt(i); highlightChannelThumb(); }); tcon.appendChild(div); }); highlightChannelThumb(); }catch(e){console.warn(e);} }
+
+    function highlightActiveThumb(){ try{ var idx=player.getPlaylistIndex(); var thumbs=document.querySelectorAll('#thumbs .thumb'); thumbs.forEach(function(t,i){ t.classList.toggle('active',i===idx); }); }catch(e){}
+    }
+    function highlightChannelThumb(){ try{ var idx=channelPlayer.getPlaylistIndex(); var thumbs=document.querySelectorAll('#channelThumbs .thumb'); thumbs.forEach(function(t,i){ t.classList.toggle('active',i===idx); }); }catch(e){}
+    }
+
+    document.addEventListener('DOMContentLoaded',function(){
+      document.getElementById('prevBtn').addEventListener('click',function(){ try{ player.previousVideo(); }catch(e){} });
+      document.getElementById('nextBtn').addEventListener('click',function(){ try{ player.nextVideo(); }catch(e){} });
+      document.getElementById('openChannel').addEventListener('click',function(){ window.open('https://www.youtube.com/channel/'+channelId,'_blank'); });
+
+      // modal handlers
+      var modal=document.getElementById('channelModal');
+      document.getElementById('openChannelModal').addEventListener('click',function(){ modal.classList.add('open'); document.body.style.overflow='hidden'; try{ channelPlayer.playVideoAt(channelPlayer.getPlaylistIndex()||0); }catch(e){} });
+      document.getElementById('closeModal').addEventListener('click',function(){ modal.classList.remove('open'); document.body.style.overflow='auto'; try{ channelPlayer.pauseVideo(); }catch(e){} });
+
+      // try to populate thumbs periodically until available
+      var attempts=0; var t=setInterval(function(){ attempts++; try{ if(player && player.getPlaylist && player.getPlaylist().length>0){ buildThumbnails(); buildChannelThumbnails(); clearInterval(t);} }catch(e){} if(attempts>20) clearInterval(t); },500);
+    });
+  </script>
+</body>
+</html>
