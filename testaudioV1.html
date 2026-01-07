@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>World News — Audio Stream</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#1e90ff;--muted:#94a3b8;--text:#e6eef8}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:var(--text);background:linear-gradient(180deg,#071024 0%,#0b1220 60%)}
+    .wrap{max-width:980px;margin:48px auto;padding:28px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6)}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{font-size:1.6rem;margin:0}
+    .meta{color:var(--muted);font-size:0.9rem}
+    .hero{display:grid;grid-template-columns:1fr 260px;gap:20px}
+    article{line-height:1.6}
+    .card{background:rgba(255,255,255,0.02);padding:18px;border-radius:10px}
+    .controls{display:flex;flex-direction:column;gap:10px}
+    .controls .btn{background:var(--accent);border:none;color:white;padding:10px 12px;border-radius:8px;font-weight:600;cursor:pointer}
+    .controls .btn[disabled]{opacity:0.6;cursor:default}
+    .small{font-size:0.9rem;color:var(--muted)}
+    /* Hide the iframe visually but keep it in DOM for playback */
+    #ytplayer{position:fixed;left:-9999px;width:1px;height:1px;opacity:0}
+    @media (max-width:740px){.hero{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>World News — Stream</h1>
+        <div class="meta">Short updates and an ambient audio stream</div>
+      </div>
+      <div class="small">Updated: January 7, 2026</div>
+    </header>
+
+    <div class="hero">
+      <div>
+        <section class="card">
+          <h2 style="margin-top:0">Top Stories (brief)</h2>
+          <p>Global markets, climate response, technology regulation, and humanitarian developments remain central to headlines worldwide. This page provides a short digest while an ambient audio stream plays in the background like a radio.</p>
+          <ul>
+            <li>Markets and economy: ongoing shifts after recent policy changes.</li>
+            <li>Environment: international climate talks and extreme weather responses.</li>
+            <li>Technology: AI policy and regulation continue to be debated.</li>
+            <li>Humanitarian: aid and recovery efforts in affected regions.</li>
+          </ul>
+          <p class="small">This is a simple demo page combining short news copy with a background audio stream sourced from a YouTube link.</p>
+        </section>
+      </div>
+
+      <aside>
+        <div class="card controls">
+          <div class="small">Background audio source</div>
+          <div class="small">YouTube ID: <strong>Dx8sf9dNQWQ</strong></div>
+          <button id="playBtn" class="btn">Play</button>
+          <button id="pauseBtn" class="btn" disabled>Pause</button>
+          <button id="muteBtn" class="btn">Mute</button>
+          <div class="small" id="status">Status: idle</div>
+          <div class="small" style="margin-top:8px">Note: Some browsers block autoplay with sound. If audio doesn't start automatically, press Play.</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Hidden YouTube player used as audio source (no local download required) -->
+  <div id="player-wrap">
+    <div id="ytplayer"></div>
+  </div>
+
+  <script>
+    // Load YouTube IFrame API
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+
+    var player;
+    function onYouTubeIframeAPIReady(){
+      player = new YT.Player('ytplayer',{
+        height: '1',
+        width: '1',
+        videoId: 'Dx8sf9dNQWQ',
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          rel: 0,
+          modestbranding: 1,
+          iv_load_policy: 3,
+          playsinline: 1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function updateStatus(t){document.getElementById('status').textContent = 'Status: '+t}
+
+    function onPlayerReady(e){
+      // Best-effort: start muted (increases chance autoplay is allowed), then try to unmute.
+      try{
+        var ifr = player.getIframe();
+        if(ifr && ifr.setAttribute) ifr.setAttribute('allow', 'autoplay; encrypted-media');
+        e.target.mute();
+        e.target.playVideo();
+        updateStatus('playing (muted)');
+      } catch(err){ updateStatus('ready'); }
+
+      document.getElementById('playBtn').disabled = false;
+
+      // Attempt to unmute after a short delay (may still be blocked without user gesture)
+      setTimeout(function(){ try{ e.target.unMute(); updateStatus('playing (unmute attempted)'); document.getElementById('playBtn').disabled=true; document.getElementById('pauseBtn').disabled=false; }catch(err){} }, 600);
+    }
+
+    function onPlayerStateChange(e){
+      var st = e.data;
+      if(st === YT.PlayerState.PLAYING) updateStatus('playing');
+      else if(st === YT.PlayerState.PAUSED) updateStatus('paused');
+      else if(st === YT.PlayerState.ENDED) updateStatus('ended');
+    }
+
+    // Controls
+    document.addEventListener('DOMContentLoaded', function(){
+      var play = document.getElementById('playBtn');
+      var pause = document.getElementById('pauseBtn');
+      var mute = document.getElementById('muteBtn');
+
+      play.addEventListener('click', function(){ if(player && player.playVideo) { player.playVideo(); try{ player.unMute(); }catch(e){} play.disabled=true; pause.disabled=false; updateStatus('playing'); } });
+      pause.addEventListener('click', function(){ if(player && player.pauseVideo){ player.pauseVideo(); pause.disabled=true; play.disabled=false; updateStatus('paused'); } });
+      mute.addEventListener('click', function(){ if(player && player.isMuted){ if(player.isMuted()) { player.unMute(); mute.textContent='Mute'; } else { player.mute(); mute.textContent='Unmute'; } } });
+    });
+  </script>
+</body>
+</html>
