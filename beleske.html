@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="sr-Cyrl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Белешке — Душан Стаменковић</title>
+  <style>
+    :root{--bg:#f6f8fb;--card:#ffffff;--muted:#6b7280;--accent:#1e40af}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;background:var(--bg);color:#0f1724}
+    .wrap{max-width:980px;margin:36px auto;padding:28px}
+    header{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+    h1{margin:0;font-size:1.6rem}
+    .meta{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:20px;margin-top:20px}
+    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(15,23,36,0.06)}
+    .summary p{line-height:1.6;margin:0 0 10px}
+    .player{display:flex;flex-direction:column;gap:12px}
+    .video-wrap{background:#000;border-radius:8px;overflow:hidden}
+    .thumbs{display:flex;gap:8px;overflow:auto;padding:6px}
+    .thumb{width:96px;flex:0 0 96px;cursor:pointer;border-radius:6px;opacity:0.9}
+    .thumb img{width:100%;height:56px;object-fit:cover;border-radius:6px}
+    .thumb.active{outline:3px solid #ef4444;opacity:1}
+    .controls{display:flex;gap:8px;align-items:center}
+    .btn{background:var(--accent);color:#fff;padding:10px 12px;border-radius:8px;border:none;cursor:pointer}
+    .note{color:var(--muted);font-size:0.95rem}
+    @media (max-width:860px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Белешке</h1>
+        <div class="meta">Душан Стаменковић — кратке мисли, белешке и видео записи</div>
+      </div>
+      <div class="meta">Ажурирано: автоматски</div>
+    </header>
+
+    <div class="grid">
+      <main>
+        <section class="card summary">
+          <h2 style="margin-top:0">Резиме странице</h2>
+          <p>Покушао сам да преузмем онлајн садржај са адресе <a href="https://dusanstamenkovic.com/beleske/">dusanstamenkovic.com/beleske/</a>, али директно читање странице није успело (ограничење саобраћаја/HTTP 429). Молим вас, ако желите прецизан и детаљан резиме — залепите овде текст странице или дозволите да поновим преузимање.</p>
+          <p>Док не добијем оригинални садржај, овде стоји кратак општи опис: страница "Белешке" садржи личне записе, осећања, реферате и напомене аутора, линкове ка релевантним текстовима и видео материјалима. Ако пошаљете садржај, урадићу детаљни резиме са нагласком на важне тезе.</p>
+          <p class="note">Напомена: доњи видео плејер приказује листу видео записа са YouTube канала аутора; клик на сличицу учитава и покреће тај видео.</p>
+        </section>
+
+        <section class="card" style="margin-top:16px">
+          <h3 style="margin-top:0">Детаљнија белешка (placeholder)</h3>
+          <p class="note">Овде ће ићи издвојене белешке након што буде доступан оригинални текст.</p>
+        </section>
+      </main>
+
+      <aside>
+        <div class="card player">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Видео плейлист</strong><div class="note">Из канала: Душан Стаменковић</div></div>
+            <div class="note">Ова страница је на ћирилици</div>
+          </div>
+
+          <div class="video-wrap" id="videoWrap">
+            <!-- YouTube iframe player will be inserted here -->
+            <div id="ytPlayerRoot"></div>
+          </div>
+
+          <div class="controls">
+            <button id="prevBtn" class="btn">Претходни</button>
+            <button id="nextBtn" class="btn">Следећи</button>
+            <div style="flex:1"></div>
+            <button id="openChannel" class="btn" style="background:#ef4444">Отвори канал</button>
+          </div>
+
+          <div class="thumbs card" id="thumbs" style="margin-top:8px;padding:8px;background:transparent;box-shadow:none"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // Channel uploads playlist ID derived from channel ID: change UC... -> UU...
+    var channelId = 'UCgs-YbaXKRMKnNgcx-rduIQ';
+    var uploadsPlaylistId = 'UU' + channelId.substring(2);
+
+    // Create YouTube iframe with playlist
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+
+    var player;
+    function onYouTubeIframeAPIReady(){
+      player = new YT.Player('ytPlayerRoot',{
+        height: '360',
+        width: '640',
+        playerVars: {
+          listType: 'playlist',
+          list: uploadsPlaylistId,
+          controls: 1,
+          modestbranding: 1,
+          rel: 0
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerReady(e){
+      // build thumbnails once playlist is available
+      buildThumbnails();
+    }
+
+    function onPlayerStateChange(e){
+      highlightActiveThumb();
+    }
+
+    // Build thumbnails from player.getPlaylist()
+    function buildThumbnails(){
+      try{
+        var list = player.getPlaylist();
+        var thumbs = document.getElementById('thumbs');
+        thumbs.innerHTML = '';
+        if(!list || list.length === 0){
+          // fallback: show message
+          thumbs.innerHTML = '<div class="note">Садржај плейлиста није доступан одмах; освежите или сачекајте.</div>';
+          return;
+        }
+        list.forEach(function(vid, idx){
+          var div = document.createElement('div'); div.className='thumb';
+          var img = document.createElement('img');
+          img.src = 'https://i.ytimg.com/vi/' + vid + '/mqdefault.jpg';
+          img.alt = 'Видео ' + (idx+1);
+          div.appendChild(img);
+          div.addEventListener('click', function(){ player.playVideoAt(idx); highlightActiveThumb(); });
+          thumbs.appendChild(div);
+        });
+        highlightActiveThumb();
+      }catch(err){
+        console.warn('buildThumbnails error', err);
+      }
+    }
+
+    function highlightActiveThumb(){
+      try{
+        var idx = player.getPlaylistIndex();
+        var thumbs = document.querySelectorAll('#thumbs .thumb');
+        thumbs.forEach(function(t,i){ t.classList.toggle('active', i===idx); });
+      }catch(err){ }
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      document.getElementById('prevBtn').addEventListener('click', function(){ try{ player.previousVideo(); }catch(e){} });
+      document.getElementById('nextBtn').addEventListener('click', function(){ try{ player.nextVideo(); }catch(e){} });
+      document.getElementById('openChannel').addEventListener('click', function(){ window.open('https://www.youtube.com/channel/' + channelId,'_blank'); });
+
+      // Try rebuilding thumbs periodically until playlist is available
+      var attempts = 0;
+      var t = setInterval(function(){
+        attempts++; try{ if(player && player.getPlaylist && player.getPlaylist().length>0){ buildThumbnails(); clearInterval(t);} }catch(e){}
+        if(attempts>15){ clearInterval(t); }
+      },500);
+    });
+  </script>
+</body>
+</html>
