@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Serbia — Top News & Weather</title>
+  <link rel="stylesheet" href="news_weather.css">
+</head>
+<body>
+  <main>
+    <h1>Serbia — Top News & Weather</h1>
+
+    <section id="news-section">
+      <h2>Top 5 Latest News</h2>
+      <div id="news-updated" class="meta">—</div>
+      <ul id="news-list"></ul>
+      <div class="small">News auto-refreshes every 10 minutes.</div>
+    </section>
+
+    <section id="weather-section">
+      <h2>Current Weather (Belgrade, Serbia)</h2>
+      <div id="weather-updated" class="meta">—</div>
+      <div id="weather">
+        <div id="temp">—</div>
+        <div id="desc">—</div>
+        <div id="wind">—</div>
+      </div>
+      <div class="small">Weather auto-refreshes every 5 minutes.</div>
+    </section>
+
+    <footer>
+      <small>Sources: Google News (RSS via allorigins proxy) and Open-Meteo.</small>
+    </footer>
+  </main>
+
+  <script src="news_weather.js"></script>
+</body>
+</html>
