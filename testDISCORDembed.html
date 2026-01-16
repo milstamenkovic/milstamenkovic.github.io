@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Community Page</title>
+    <style>
+        /* CSS3 Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c2f33; /* Discord Dark Theme Color */
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .content-box {
+            flex: 2;
+            background: #23272a;
+            padding: 20px;
+            border-radius: 8px;
+            min-width: 300px;
+        }
+
+        /* Discord Sidebar Styling */
+        .discord-sidebar {
+            flex: 1;
+            min-width: 350px;
+        }
+
+        iframe {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .status-badge {
+            background: #7289da;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to Our Community</h1>
+        <p>Stay connected with us directly through Discord.</p>
+    </header>
+
+    <div class="container">
+        <!-- Main Website Content -->
+        <div class="content-box">
+            <h2>About the Server</h2>
+            <p>This is a sample layout for your website. You can add your blog posts, videos, or news updates here.</p>
+            <div id="js-greeting" class="status-badge">Loading...</div>
+        </div>
+
+        <!-- Discord Embed Section -->
+        <div class="discord-sidebar">
+            <!-- REPLACE THE 'ID' BELOW with your Server ID from Discord Settings -->
+            <iframe 
+                src="https://discord.com" 
+                width="350" 
+                height="500" 
+                allowtransparency="true" 
+                frameborder="0" 
+                sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
+            </iframe>
+        </div>
+    </div>
+
+    <script>
+        // Simple JS to personalize the page based on time
+        const greetingDiv = document.getElementById('js-greeting');
+        const hour = new Date().getHours();
+        
+        if (hour < 12) greetingDiv.textContent = "Good morning! Come chat with us.";
+        else if (hour < 18) greetingDiv.textContent = "Good afternoon! The server is active.";
+        else greetingDiv.textContent = "Good evening! Join the night owls.";
+    </script>
+
+    <!-- OPTIONAL: Uncomment the script below if you use WidgetBot.io for FULL CHAT -->
+    <!-- 
+    <script src="https://cdn.jsdelivr.net" async defer>
+        new Crate({
+            server: 'YOUR_SERVER_ID_HERE',
+            channel: 'YOUR_CHANNEL_ID_HERE'
+        })
+    </script> 
+    -->
+
+</body>
+</html>
