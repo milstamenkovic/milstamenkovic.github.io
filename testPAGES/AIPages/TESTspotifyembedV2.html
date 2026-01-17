@@ -20,23 +20,25 @@
             text-align: center;
         }
 
-        .spotify-bottom {
+        .spotify-players {
             position: fixed;
             bottom: 20px;
             left: 0;
             right: 0;
             display: flex;
+            flex-wrap: wrap-reverse;
             justify-content: center;
             gap: 20px;
             padding: 0 20px;
             z-index: 1000;
-            align-items: flex-end; 
+            align-items: flex-end;
         }
 
         /* Container that handles the size transition */
         .iframe-container {
-            width: 100%;
-            max-width: 400px;
+            width: 45%;
+            max-width: 500px;
+            min-width: 500px;
             height: 80px; /* Initial compact height */
             transition: height 0.5s ease;
             border-radius: 12px;
@@ -63,13 +65,17 @@
         <p>Test webpage with multiple Spotify embed players, with a help of AI.</p>
     </div>
 
-    <div class="spotify-bottom">
+    <div class="spotify-players">
         <div class="iframe-container">
             <iframe src="https://open.spotify.com/embed/album/3K1VT17LxgS2a3v0Ai65Lg?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
 
         <div class="iframe-container">
             <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX1spT6G94GFC?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+
+        <div class="iframe-container">
+            <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DWXRqgorJj26U?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
     </div>
 
