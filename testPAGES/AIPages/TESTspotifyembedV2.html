@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mil Stamenković GITHUB Website</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .content {
+            text-align: center;
+        }
+
+        .spotify-bottom {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 20px;
+            z-index: 1000;
+            /* Ensures they grow upward from the bottom */
+            align-items: flex-end; 
+        }
+
+        /* 1. We wrap your iframes in a container to control the size */
+        .iframe-wrapper {
+            width: 100%;
+            max-width: 400px;
+            height: 350px; /* Compact height */
+            transition: height 0.5s ease; /* Smooth growth animation */
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* 2. When the user clicks (focuses) the iframe, it grows */
+        .iframe-wrapper:focus-within {
+            height: 700px;
+        }
+
+        /* Ensure the iframe fills the wrapper */
+        .iframe-wrapper iframe {
+            width: 100%;
+            height: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="content">
+        <h1>Mil Stamenković GITHUB Website</h1>
+        <p>Test webpage with multiple Spotify embed players, with a help of AI.</p>
+    </div>
+
+    <div class="spotify-bottom">
+        <!-- Player 1 -->
+        <div class="iframe-wrapper">
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/album/3K1VT17LxgS2a3v0Ai65Lg?utm_source=generator" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
+            </iframe>
+        </div>
+
+        <!-- Player 2 -->
+        <div class="iframe-wrapper">
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX1spT6G94GFC?utm_source=generator frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
+            </iframe>
+        </div>
+    </div>
+
+</body>
+</html>
