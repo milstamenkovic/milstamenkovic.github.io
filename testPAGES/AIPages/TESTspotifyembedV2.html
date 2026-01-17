@@ -30,31 +30,30 @@
             gap: 20px;
             padding: 0 20px;
             z-index: 1000;
-            /* Ensures they grow upward from the bottom */
             align-items: flex-end; 
         }
 
-        /* 1. We wrap your iframes in a container to control the size */
-        .iframe-wrapper {
+        /* Container that handles the size transition */
+        .iframe-container {
             width: 100%;
             max-width: 400px;
-            height: 350px; /* Compact height */
-            transition: height 0.5s ease; /* Smooth growth animation */
+            height: 80px; /* Initial compact height */
+            transition: height 0.5s ease;
             border-radius: 12px;
             overflow: hidden;
+            background: #282828;
         }
 
-        /* 2. When the user clicks (focuses) the iframe, it grows */
-        .iframe-wrapper:focus-within {
-            height: 700px;
+        /* Class that will be added when you click play */
+        .iframe-container.expanded {
+            height: 352px;
         }
 
-        /* Ensure the iframe fills the wrapper */
-        .iframe-wrapper iframe {
+        .iframe-container iframe {
             width: 100%;
             height: 100%;
+            border: none;
         }
-
     </style>
 </head>
 <body>
@@ -65,18 +64,33 @@
     </div>
 
     <div class="spotify-bottom">
-        <!-- Player 1 -->
-        <div class="iframe-wrapper">
-            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/album/3K1VT17LxgS2a3v0Ai65Lg?utm_source=generator" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
-            </iframe>
+        <div class="iframe-container">
+            <iframe src="https://open.spotify.com/embed/album/3K1VT17LxgS2a3v0Ai65Lg?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
 
-        <!-- Player 2 -->
-        <div class="iframe-wrapper">
-            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX1spT6G94GFC?utm_source=generator frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
-            </iframe>
+        <div class="iframe-container">
+            <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX1spT6G94GFC?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
     </div>
+
+    <script>
+        // Check every 200ms if the user has clicked inside an iframe
+        setInterval(function() {
+            const activeElement = document.activeElement;
+            
+            if (activeElement && activeElement.tagName === 'IFRAME') {
+                // Find the container for this specific iframe and expand it
+                activeElement.parentElement.classList.add('expanded');
+            }
+        }, 200);
+
+        // Optional: Shrink if user clicks outside on the main page
+        window.addEventListener('mousedown', function() {
+            document.querySelectorAll('.iframe-container').forEach(el => {
+                el.classList.remove('expanded');
+            });
+        });
+    </script>
 
 </body>
 </html>
