@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mil Stamenković GITHUB Website</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .content {
+            text-align: center;
+        }
+
+        .spotify-players {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-wrap: wrap-reverse;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 20px;
+            z-index: 1000;
+            align-items: flex-end;
+        }
+
+        .iframe-container {
+            width: 45%;
+            max-width: 500px;
+            min-width: 500px;
+            height: 80px; 
+            transition: height 0.5s ease;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #282828;
+            cursor: pointer; /* Indicates it is clickable */
+            position: relative;
+        }
+
+        /* This overlay allows us to capture the first click to expand */
+        .iframe-container::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1; /* Sits above the iframe */
+        }
+
+        /* When expanded, we move the overlay behind so the user can use the player */
+        .iframe-container.expanded::after {
+            bottom: 60px; /* Leaves the top part clickable to shrink back */
+            z-index: -1; 
+        }
+
+        .iframe-container.expanded {
+            height: 352px;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content">
+        <h1>Mil Stamenković GITHUB Website</h1>
+        <p>Click a player to expand/shrink.</p>
+    </div>
+
+    <div class="spotify-players">
+        <div class="iframe-container">
+            <iframe src="https://open.spotify.com/embed/album/3K1VT17LxgS2a3v0Ai65Lg" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+
+        <div class="iframe-container">
+            <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX1spT6G94GFC" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Select all player containers
+        const containers = document.querySelectorAll('.iframe-container');
+
+        containers.forEach(container => {
+            container.addEventListener('click', function() {
+                // Check if this specific player is already expanded
+                const isExpanded = this.classList.contains('expanded');
+                
+                // Close all other players first (optional, for a cleaner UI)
+                containers.forEach(c => c.classList.remove('expanded'));
+
+                // If it wasn't expanded, expand it now
+                if (!isExpanded) {
+                    this.classList.add('expanded');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
