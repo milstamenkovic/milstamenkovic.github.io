@@ -34,33 +34,19 @@
             align-items: flex-end;
         }
 
+        /* Container that handles the size transition */
         .iframe-container {
             width: 45%;
             max-width: 500px;
             min-width: 500px;
-            height: 80px; 
+            height: 80px; /* Initial compact height */
             transition: height 0.5s ease;
             border-radius: 12px;
             overflow: hidden;
             background: #282828;
-            cursor: pointer; /* Indicates it is clickable */
-            position: relative;
         }
 
-        /* This overlay allows us to capture the first click to expand */
-        .iframe-container::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 1; /* Sits above the iframe */
-        }
-
-        /* When expanded, we move the overlay behind so the user can use the player */
-        .iframe-container.expanded::after {
-            bottom: 60px; /* Leaves the top part clickable to shrink back */
-            z-index: -1; 
-        }
-
+        /* Class that will be added when you click play */
         .iframe-container.expanded {
             height: 352px;
         }
@@ -76,36 +62,62 @@
 
     <div class="content">
         <h1>Mil Stamenković GITHUB Website</h1>
-        <p>Click a player to expand/shrink.</p>
+        <p>Test webpage with multiple Spotify embed players, with a help of AI.</p>
     </div>
 
     <div class="spotify-players">
         <div class="iframe-container">
-            <iframe src="https://open.spotify.com/embed/album/3K1VT17LxgS2a3v0Ai65Lg" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            <iframe src="https://open.spotify.com/embed/album/3K1VT17LxgS2a3v0Ai65Lg?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
 
         <div class="iframe-container">
-            <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX1spT6G94GFC" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX1spT6G94GFC?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+
+        <div class="iframe-container">
+            <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DWXRqgorJj26U?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
     </div>
 
     <script>
-        // Select all player containers
-        const containers = document.querySelectorAll('.iframe-container');
+        // Variable to track which player is currently expanded
+        let expandedContainer = null;
 
-        containers.forEach(container => {
-            container.addEventListener('click', function() {
-                // Check if this specific player is already expanded
-                const isExpanded = this.classList.contains('expanded');
-                
-                // Close all other players first (optional, for a cleaner UI)
-                containers.forEach(c => c.classList.remove('expanded'));
+        setInterval(function() {
+            const activeElement = document.activeElement;
+            
+            if (activeElement && activeElement.tagName === 'IFRAME') {
+                const parent = activeElement.parentElement;
 
-                // If it wasn't expanded, expand it now
-                if (!isExpanded) {
-                    this.classList.add('expanded');
+                // If the clicked one is already expanded, shrink it
+                if (parent.classList.contains('expanded')) {
+                    parent.classList.remove('expanded');
+                    expandedContainer = null;
+                } else {
+                    // Shrink any other expanded players first
+                    document.querySelectorAll('.iframe-container').forEach(el => {
+                        el.classList.remove('expanded');
+                    });
+                    // Expand the new one
+                    parent.classList.add('expanded');
+                    expandedContainer = parent;
                 }
-            });
+
+                // IMPORTANT: Blur the iframe so the next click can be detected
+                activeElement.blur();
+                window.focus();
+            }
+        }, 200);
+
+        // Keep the "click outside" to shrink logic
+        window.addEventListener('mousedown', function(e) {
+            // Only shrink if we didn't click a container
+            if (!e.target.closest('.iframe-container')) {
+                document.querySelectorAll('.iframe-container').forEach(el => {
+                    el.classList.remove('expanded');
+                });
+                expandedContainer = null;
+            }
         });
     </script>
 
