@@ -80,44 +80,22 @@
     </div>
 
     <script>
-        // Variable to track which player is currently expanded
-        let expandedContainer = null;
+        // Select all containers
+        const containers = document.querySelectorAll('.iframe-container');
 
-        setInterval(function() {
-            const activeElement = document.activeElement;
-            
-            if (activeElement && activeElement.tagName === 'IFRAME') {
-                const parent = activeElement.parentElement;
+        containers.forEach(container => {
+            // 1. Expand when mouse enters the player area
+            container.addEventListener('mouseenter', () => {
+                // Optional: shrink others first so only one is big at a time
+                containers.forEach(c => c.classList.remove('expanded'));
+                
+                container.classList.add('expanded');
+            });
 
-                // If the clicked one is already expanded, shrink it
-                if (parent.classList.contains('expanded')) {
-                    parent.classList.remove('expanded');
-                    expandedContainer = null;
-                } else {
-                    // Shrink any other expanded players first
-                    document.querySelectorAll('.iframe-container').forEach(el => {
-                        el.classList.remove('expanded');
-                    });
-                    // Expand the new one
-                    parent.classList.add('expanded');
-                    expandedContainer = parent;
-                }
-
-                // IMPORTANT: Blur the iframe so the next click can be detected
-                activeElement.blur();
-                window.focus();
-            }
-        }, 200);
-
-        // Keep the "click outside" to shrink logic
-        window.addEventListener('mousedown', function(e) {
-            // Only shrink if we didn't click a container
-            if (!e.target.closest('.iframe-container')) {
-                document.querySelectorAll('.iframe-container').forEach(el => {
-                    el.classList.remove('expanded');
-                });
-                expandedContainer = null;
-            }
+            // 2. Shrink when mouse leaves the player area
+            container.addEventListener('mouseleave', () => {
+                container.classList.remove('expanded');
+            });
         });
     </script>
 
