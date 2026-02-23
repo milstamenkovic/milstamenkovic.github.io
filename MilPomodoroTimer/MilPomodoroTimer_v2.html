@@ -61,18 +61,18 @@
 
   h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 2rem;
+    font-size: 1rem;
     letter-spacing: -0.5px;
     margin-bottom: 8px;
     color: var(--text);
   }
 
   .subtitle {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--muted);
     letter-spacing: 3px;
     text-transform: uppercase;
-    margin-bottom: 48px;
+    margin-bottom: 30px;
   }
 
   /* ── EDITOR ── */
@@ -507,7 +507,7 @@
 <h1>Mil Pomodoro Timer</h1>
 <p style="font-size: 0.5em;"> Created by Mil Stamenković</p>
 <br>
-<p class="subtitle">Focus · Work · Repeat</p>
+<p class="subtitle">Work - Refresh - Repeat</p>
 
 <!-- Notification permission banner -->
 <div id="notif-banner"
@@ -519,13 +519,13 @@
 <!-- ── EDITOR ── -->
 <div id="editor">
   <div class="editor-header">
-    <span>Your Session</span>
+    <span>Session</span>
     <span id="total-time-label"></span>
   </div>
   <div class="task-list" id="task-list"></div>
   <div class="editor-actions">
     <button class="add-task" onclick="addTask()">+ Add Task</button>
-    <button class="add-task" onclick="addPause()" style="flex:0.6">+ Pause</button>
+    <button class="add-task" onclick="addPause()" style="flex:0.6">+ Add Pause</button>
     <button class="start-btn" onclick="startSession()">START</button>
   </div>
 </div>
@@ -662,7 +662,7 @@
                class="${t.type === 'pause' ? 'pause-name' : ''}"
                oninput="tasks[${i}].name=this.value" />
         <input type="number" min="1" max="999" value="${t.minutes}"
-               oninput="tasks[${i}].minutes=Math.max(1,parseInt(this.value)||1)" />
+               oninput="tasks[${i}].minutes=Math.max(1,parseInt(this.value)||1); renderEditor()" />
         <button class="remove" onclick="removeTask(${i})">×</button>
       `;
       list.appendChild(row);
