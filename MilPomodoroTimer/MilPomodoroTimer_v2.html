@@ -14,17 +14,28 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0f0f;
+    /* Original color scheme with CSS variables for easy tweaking */
+    /*--bg: #0f0f0f;
     --surface: #1a1a1a;
     --border: #2a2a2a;
     --accent: #e8c547;
     --pause-accent: #6bc5a8;
     --text: #f0ede6;
     --muted: #666;
-    --danger: #e05252;
+    --danger: #e05252;*/
+
+    /* Mil color scheme */
+    --bg: #000000;
+    --surface: #1d1d1d;
+    --border: #2a2a2a;
+    --accent: #960000;
+    --pause-accent: #960000;
+    --text: #afafaf;
+    --muted: #595959;
+    --danger: #646464;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     background: var(--bg);
@@ -67,7 +78,7 @@
   /* ── EDITOR ── */
   #editor {
     width: 100%;
-    max-width: 560px;
+    max-width: 540px;
   }
 
   .editor-header {
@@ -78,7 +89,7 @@
   }
 
   .editor-header span {
-    font-size: 0.65rem;
+    font-size: 0.65em;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--muted);
@@ -87,13 +98,13 @@
   .task-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
+    gap: 5px;
+    margin-bottom: 10px;
   }
 
   .task-row {
     display: flex;
-    gap: 8px;
+    gap: 5px;
     align-items: center;
     animation: slideIn 0.2s ease;
   }
@@ -112,8 +123,8 @@
     border-radius: 6px;
     color: var(--muted);
     font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
-    padding: 10px 0;
+    font-size: 0.65em;
+    padding: 5px 0;
     cursor: pointer;
     letter-spacing: 1px;
     text-align: center;
@@ -132,8 +143,8 @@
     border-radius: 6px;
     color: var(--text);
     font-family: 'DM Mono', monospace;
-    font-size: 0.85rem;
-    padding: 10px 14px;
+    font-size: 0.65em;
+    padding: 5px 14px;
     outline: none;
     transition: border-color 0.2s;
   }
@@ -154,8 +165,8 @@
     border-radius: 6px;
     color: var(--text);
     font-family: 'DM Mono', monospace;
-    font-size: 0.85rem;
-    padding: 10px 10px;
+    font-size: 0.65rem;
+    padding: 5px 10px;
     outline: none;
     text-align: center;
     transition: border-color 0.2s;
@@ -174,7 +185,7 @@
     flex-shrink: 0;
     background: none;
     border: none;
-    color: var(--muted);
+    color: var(--accent);
     cursor: pointer;
     font-size: 1.1rem;
     line-height: 1;
@@ -188,6 +199,7 @@
 
   .editor-actions {
     display: flex;
+    height: 30px;
     gap: 8px;
   }
 
@@ -198,11 +210,14 @@
     border-radius: 6px;
     color: var(--muted);
     font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     padding: 10px;
     cursor: pointer;
     letter-spacing: 1px;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   button.add-task:hover {
@@ -211,18 +226,21 @@
   }
 
   button.start-btn {
-    background: red;
+    background: var(--accent);
     border: none;
     border-radius: 6px;
     color: #0f0f0f;
     font-family: 'DM Mono', monospace;
     font-size: 0.8rem;
-    font-weight: 500;
+    font-weight: 800;
     padding: 10px 28px;
     cursor: pointer;
     letter-spacing: 2px;
     text-transform: uppercase;
     transition: opacity 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   button.start-btn:hover { opacity: 0.85; transform: translateY(-1px); }
@@ -233,27 +251,26 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 300px;
+    max-width: 240px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 5px;
-    margin-bottom: 16px;
-    font-size: 0.5em;
+    border-radius: 9px;
+    padding: 6px;
+    margin-bottom: 10px;
+    font-size: 0.5rem;
     color: var(--muted);
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    text-align: center;
+    gap: 5px;
   }
 
   #notif-banner button {
-    background: white;
+    background: green;
     border: none;
     border-radius: 5px;
     color: #0f0f0f;
     font-family: 'DM Mono', monospace;
-    font-size: 0.5em;
+    font-size: 1em;
     letter-spacing: 1px;
     padding: 5px;
     cursor: pointer;
@@ -340,7 +357,7 @@
   .clock.is-pause { color: var(--pause-accent); }
 
   .total-left {
-    font-size: 0.7rem;
+    font-size: 0.5em;
     color: var(--muted);
     letter-spacing: 1px;
     margin-bottom: 48px;
@@ -494,9 +511,9 @@
 
 <!-- Notification permission banner -->
 <div id="notif-banner"
-  <span>Enable Windows notifications to get alerts when each timer ends.</span>
+  <span>Enable notifications for this website for Alarm</span>
   <button onclick="requestNotifPermission()">Enable</button>
-  <p style="font-size: 0.5em;">Install this page as PWA for easier use.</p>
+  <p style="font-style: italic;">Install this page as PWA for easier use.</p>
 </div>
 
 <!-- ── EDITOR ── -->
