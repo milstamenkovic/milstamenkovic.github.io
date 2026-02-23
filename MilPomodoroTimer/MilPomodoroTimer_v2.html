@@ -1,4 +1,4 @@
-<!-- Mil Pomodoro Timer v1 -->
+<!-- Mil Pomodoro Timer v2 -->
 <!-- Simple Pomodoro Timer with continues timers for tasts and pauses by Mil Stamenković -->
 <!-- Created with help of Claude AI -->
 <!-- © 2026 Mil Stamenković -->
@@ -10,7 +10,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Task Timer</title>
+<title>Mil Pomodoro Timer</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -211,7 +211,7 @@
   }
 
   button.start-btn {
-    background: var(--accent);
+    background: red;
     border: none;
     border-radius: 6px;
     color: #0f0f0f;
@@ -230,31 +230,32 @@
 
   /* Notification permission banner */
   #notif-banner {
-    display: none;
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    max-width: 560px;
+    max-width: 300px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 12px 16px;
+    padding: 5px;
     margin-bottom: 16px;
-    font-size: 0.72rem;
+    font-size: 0.5em;
     color: var(--muted);
-    display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
+    text-align: center;
   }
 
   #notif-banner button {
-    background: var(--accent);
+    background: white;
     border: none;
     border-radius: 5px;
     color: #0f0f0f;
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.5em;
     letter-spacing: 1px;
-    padding: 6px 14px;
+    padding: 5px;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
@@ -486,13 +487,16 @@
 
 <div id="flash"></div>
 
-<h1>Task Timer</h1>
+<h1>Mil Pomodoro Timer</h1>
+<p style="font-size: 0.5em;"> Created by Mil Stamenković</p>
+<br>
 <p class="subtitle">Focus · Work · Repeat</p>
 
 <!-- Notification permission banner -->
-<div id="notif-banner">
+<div id="notif-banner"
   <span>Enable Windows notifications to get alerts when each timer ends.</span>
   <button onclick="requestNotifPermission()">Enable</button>
+  <p style="font-size: 0.5em;">Install this page as PWA for easier use.</p>
 </div>
 
 <!-- ── EDITOR ── -->
