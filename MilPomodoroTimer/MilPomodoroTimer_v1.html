@@ -1,4 +1,8 @@
-// Made with help of Claude AI
+<!-- Simple Pomodoro Timer with continues timers for tasts and pauses by Mil Stamenković -->
+<!-- Created with help of Claude AI -->
+<!-- © 2026 Mil Stamenković -->
+<!-- Created: 23.02.2026. - Ćuprija, Serbia -->
+<!-- Revised: 23.02.2026. - Ćuprija, Serbia -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -98,6 +102,28 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
+  /* Fixed-width type toggle so all rows align */
+  .type-toggle {
+    width: 58px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    padding: 10px 0;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .type-toggle.is-pause {
+    border-color: var(--pause-accent);
+    color: var(--pause-accent);
+  }
+
   .task-row input[type="text"] {
     flex: 1;
     background: var(--surface);
@@ -121,6 +147,7 @@
 
   .task-row input[type="number"] {
     width: 72px;
+    flex-shrink: 0;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -141,34 +168,18 @@
     border-color: var(--accent);
   }
 
-  .type-toggle {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    padding: 10px 10px;
-    cursor: pointer;
-    white-space: nowrap;
-    letter-spacing: 1px;
-    transition: all 0.2s;
-  }
-
-  .type-toggle.is-pause {
-    border-color: var(--pause-accent);
-    color: var(--pause-accent);
-  }
-
   .task-row button.remove {
+    width: 28px;
+    flex-shrink: 0;
     background: none;
     border: none;
     color: var(--muted);
     cursor: pointer;
     font-size: 1.1rem;
     line-height: 1;
-    padding: 4px 6px;
+    padding: 4px 0;
     border-radius: 4px;
+    text-align: center;
     transition: color 0.2s;
   }
 
@@ -215,6 +226,40 @@
 
   button.start-btn:hover { opacity: 0.85; transform: translateY(-1px); }
   button.start-btn:active { transform: translateY(0); }
+
+  /* Notification permission banner */
+  #notif-banner {
+    display: none;
+    width: 100%;
+    max-width: 560px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  #notif-banner button {
+    background: var(--accent);
+    border: none;
+    border-radius: 5px;
+    color: #0f0f0f;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    padding: 6px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  #notif-banner.hidden { display: none !important; }
 
   /* ── TIMER VIEW ── */
   #timer-view {
@@ -335,12 +380,6 @@
     color: #0f0f0f;
   }
 
-  .ctrl-btn.pause-primary {
-    background: var(--pause-accent);
-    border-color: var(--pause-accent);
-    color: #0f0f0f;
-  }
-
   /* Queue */
   .queue-title {
     font-size: 0.6rem;
@@ -404,7 +443,6 @@
 
   #flash.active { opacity: 1; }
 
-  /* Edit btn */
   .edit-link {
     margin-top: 32px;
     background: none;
@@ -449,6 +487,12 @@
 
 <h1>Task Timer</h1>
 <p class="subtitle">Focus · Work · Repeat</p>
+
+<!-- Notification permission banner -->
+<div id="notif-banner">
+  <span>Enable Windows notifications to get alerts when each timer ends.</span>
+  <button onclick="requestNotifPermission()">Enable</button>
+</div>
 
 <!-- ── EDITOR ── -->
 <div id="editor">
@@ -501,6 +545,35 @@
   let stepDuration = 0;
   let stepElapsed = 0;
 
+  // ── Notifications ──
+  function checkNotifBanner() {
+    if (!('Notification' in window)) return;
+    const banner = document.getElementById('notif-banner');
+    if (Notification.permission === 'default') {
+      banner.style.display = 'flex';
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
+  function requestNotifPermission() {
+    Notification.requestPermission().then(() => {
+      document.getElementById('notif-banner').classList.add('hidden');
+    });
+  }
+
+  function sendNotification(title, body) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    try {
+      const n = new Notification(title, {
+        body,
+        icon: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/23f1.svg',
+        silent: false
+      });
+      setTimeout(() => n.close(), 8000);
+    } catch(e) {}
+  }
+
   // ── Audio ──
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   function beep(freq = 880, dur = 0.15, vol = 0.4, type = 'sine') {
@@ -518,7 +591,7 @@
   }
 
   function alertSound() {
-    beep(660, 0.12); 
+    beep(660, 0.12);
     setTimeout(() => beep(880, 0.12), 140);
     setTimeout(() => beep(1100, 0.2), 280);
   }
@@ -548,7 +621,7 @@
 
   function toggleType(i) {
     tasks[i].type = tasks[i].type === 'task' ? 'pause' : 'task';
-    if (tasks[i].type === 'pause' && !tasks[i].name) tasks[i].name = 'Pause';
+    if (tasks[i].type === 'pause' && !tasks[i].name.trim()) tasks[i].name = 'Pause';
     renderEditor();
   }
 
@@ -562,11 +635,11 @@
         <button class="type-toggle ${t.type === 'pause' ? 'is-pause' : ''}" onclick="toggleType(${i})">
           ${t.type === 'pause' ? 'PAUSE' : 'TASK'}
         </button>
-        <input type="text" placeholder="${t.type === 'pause' ? 'Pause' : 'Task name…'}" 
-               value="${escHtml(t.name)}" 
+        <input type="text" placeholder="${t.type === 'pause' ? 'Pause' : 'Task name…'}"
+               value="${escHtml(t.name)}"
                class="${t.type === 'pause' ? 'pause-name' : ''}"
                oninput="tasks[${i}].name=this.value" />
-        <input type="number" min="1" max="999" value="${t.minutes}" 
+        <input type="number" min="1" max="999" value="${t.minutes}"
                oninput="tasks[${i}].minutes=Math.max(1,parseInt(this.value)||1)" />
         <button class="remove" onclick="removeTask(${i})">×</button>
       `;
@@ -575,7 +648,7 @@
 
     const total = tasks.reduce((s, t) => s + (parseInt(t.minutes) || 0), 0);
     const h = Math.floor(total / 60), m = total % 60;
-    document.getElementById('total-time-label').textContent = 
+    document.getElementById('total-time-label').textContent =
       total > 0 ? (h > 0 ? `${h}h ${m}m total` : `${m}m total`) : '';
   }
 
@@ -587,17 +660,16 @@
   function startSession() {
     const valid = tasks.filter(t => t.minutes > 0);
     if (valid.length === 0) return;
-    // fill names
     tasks.forEach((t, i) => { if (!t.name.trim()) t.name = t.type === 'pause' ? 'Pause' : `Task ${i+1}`; });
-    
+
     currentStep = 0;
     totalSecondsLeft = tasks.reduce((s, t) => s + t.minutes * 60, 0);
-    
+
     document.getElementById('editor').style.display = 'none';
     document.getElementById('done-view').style.display = 'none';
     const tv = document.getElementById('timer-view');
     tv.style.display = 'flex';
-    
+
     document.getElementById('step-total').textContent = tasks.length;
     renderQueue();
     startStep();
@@ -649,6 +721,15 @@
       clearInterval(timerInterval);
       alertSound();
       flash(tasks[currentStep].type === 'pause' ? 'rgba(107,197,168,0.2)' : 'rgba(232,197,71,0.2)');
+
+      // Windows notification
+      const finishedName = tasks[currentStep].name;
+      const nextTask = tasks[currentStep + 1];
+      const notifBody = nextTask
+        ? `Up next: ${nextTask.name} (${nextTask.minutes} min)`
+        : 'Session complete!';
+      sendNotification(`⏱ ${finishedName} done`, notifBody);
+
       setTimeout(() => {
         if (currentStep < tasks.length - 1) {
           currentStep++;
@@ -670,13 +751,12 @@
     clock.classList.toggle('warning', secondsLeft <= 60 && secondsLeft > 0 && tasks[currentStep].type !== 'pause');
     clock.classList.toggle('is-pause', tasks[currentStep].type === 'pause');
 
-    // total remaining
     const tr = totalSecondsLeft;
     const th = Math.floor(tr / 3600);
     const tm = Math.floor((tr % 3600) / 60);
     const ts = tr % 60;
-    const totalStr = th > 0 
-      ? `${th}h ${tm}m remaining in session` 
+    const totalStr = th > 0
+      ? `${th}h ${tm}m remaining in session`
       : `${tm}m ${String(ts).padStart(2,'0')}s remaining in session`;
     document.getElementById('total-left').textContent = totalStr;
   }
@@ -705,8 +785,9 @@
     dv.style.display = 'flex';
     const taskCount = tasks.filter(t => t.type === 'task').length;
     const pauseCount = tasks.filter(t => t.type === 'pause').length;
-    document.getElementById('done-stats').textContent = 
+    document.getElementById('done-stats').textContent =
       `${taskCount} task${taskCount !== 1 ? 's' : ''} · ${pauseCount} break${pauseCount !== 1 ? 's' : ''} completed`;
+    sendNotification('🎉 Session Complete!', `${taskCount} tasks finished. Great work!`);
     alertSound(); setTimeout(alertSound, 500);
   }
 
@@ -723,7 +804,7 @@
     q.innerHTML = '';
     tasks.forEach((t, i) => {
       const item = document.createElement('div');
-      item.className = 'queue-item' + 
+      item.className = 'queue-item' +
         (i === currentStep ? ' current' + (t.type === 'pause' ? ' is-pause' : '') : '') +
         (i < currentStep ? ' done' : '');
       item.innerHTML = `
@@ -734,7 +815,7 @@
     });
   }
 
-  // ── Init with sample tasks ──
+  // ── Init ──
   tasks = [
     { name: 'Task 1', minutes: 30, type: 'task' },
     { name: 'Pause',  minutes: 5,  type: 'pause' },
@@ -743,6 +824,7 @@
     { name: 'Pause',  minutes: 5,  type: 'pause' },
   ];
   renderEditor();
+  checkNotifBanner();
 </script>
 </body>
 </html>
