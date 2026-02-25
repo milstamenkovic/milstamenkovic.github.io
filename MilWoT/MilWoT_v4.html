@@ -1,6 +1,6 @@
 <!-- MilWoT - Mil Work Timer -->
 <!-- Simple workt timer with continues timers for tasks and pauses by Mil Stamenković -->
-<!-- Version 3 -->
+<!-- Version 4 -->
 <!-- © 2026 Mil Stamenković -->
 <!-- Created with help of Claude AI -->
 <!-- Created: 25.02.2026. - Ćuprija, Serbia -->
@@ -10,7 +10,7 @@
 <!-- ✔) OFFLINE mode if possible -->
 <!-- ✔) MAIN SCREEN: Entering time stays inside input field -->
 <!-- ✔) MAIN SCREEN: Drag to reorder tasks --> 
-<!-- 4) OPTIONS: Auto-language: Serbian Latin; Serbian Cyrilic; English -->
+<!-- -) OPTIONS: Auto-language: Serbian Latin; Serbian Cyrilic; English -->
 <!-- 5) BURGER MENU: Language; Light/Dark theme  -->
 <!-- 6) TIMER SCREEN: Shorter, not taking so much height on screen -->
 <!-- 7) TIMER SCREEN: Reset button -->
@@ -27,6 +27,8 @@
 <title>MilWoT</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateInit"></script>
+
 <style>
   :root {
     /* Original color scheme with CSS variables for easy tweaking */
@@ -64,6 +66,7 @@
     padding: 40px 20px;
     position: relative;
     overflow-x: hidden;
+    top: 0 !important;
   }
 
   body::before {
@@ -521,39 +524,46 @@
   flex-shrink: 0;
 }
 
-.minutes-wrap input {
-  width: 100%;
-  padding-right: 26px;
-  text-align: left;
-}
+  .minutes-wrap input {
+    width: 100%;
+    padding-right: 26px;
+    text-align: left;
+  }
 
-.minutes-wrap::after {
-  content: 'min';
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted);
-  font-size: 0.5em;
-  pointer-events: none;
-}
+  .minutes-wrap::after {
+    content: 'min';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 0.5em;
+    pointer-events: none;
+  }
 
-.drag-handle {
-  width: 16px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  color: var(--muted);
-  font-size: 0.5em;
-  cursor: grab;
-  user-select: none;
-  line-height: 1;
-}
+  .drag-handle {
+    width: 16px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    color: var(--muted);
+    font-size: 0.5em;
+    cursor: grab;
+    user-select: none;
+    line-height: 1;
+  }
 
-.drag-handle:active { cursor: grabbing; }
+  .drag-handle:active { cursor: grabbing; }
+
+  .goog-te-banner-frame {
+    display: none !important;
+  }
+  #google_translate_element {
+    display: none;
+  }
 
 </style>
 </head>
@@ -566,6 +576,8 @@
 <p style="font-size: 0.75em; font-style: italic;">Created by Mil Stamenković</p>
 <br>
 <p class="subtitle">Work - Relax - Repeat</p>
+
+<button onclick="toggleLang()" id="lang-btn">SR</button>
 
 <!-- Notification permission banner -->
 <div id="notif-banner"
@@ -621,6 +633,22 @@
 </div>
 
 <script>
+
+  // English-Serbian Translation
+
+  let isSerbian = false;
+
+  function toggleLang() {
+    const select = document.querySelector('.goog-te-combo');
+    if (!select) {
+      alert('Translate widget not loaded yet, try again in a second.');
+      return;
+    }
+    isSerbian = !isSerbian;
+    select.value = isSerbian ? 'sr' : 'en';
+    select.dispatchEvent(new Event('change'));
+    document.getElementById('lang-btn').textContent = isSerbian ? 'EN' : 'SR';
+  }
   
   // ── State ──
   let tasks = [];
@@ -755,7 +783,6 @@
   function escHtml(s) {
     return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
-
   // ── Session ──
   function startSession() {
     const valid = tasks.filter(t => t.minutes > 0);
