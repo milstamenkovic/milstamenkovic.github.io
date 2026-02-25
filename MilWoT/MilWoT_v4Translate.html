@@ -2,7 +2,7 @@
 <!-- Simple workt timer with continues timers for tasks and pauses by Mil Stamenković -->
 <!-- Version 4 Translate -->
 <!-- © 2026 Mil Stamenković -->
-<!-- Created with help of Claude AI -->
+<!-- Created with help of Free Claude AI -->
 <!-- Created: 25.02.2026. - Ćuprija, Serbia -->
 <!-- Revised: 25.02.2026. - Ćuprija, Serbia -->
 
@@ -84,9 +84,6 @@
 
   /* Language toggle button */
   #lang-btn {
-    position: fixed;
-    top: 16px;
-    right: 16px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -94,10 +91,13 @@
     font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
     letter-spacing: 2px;
-    padding: 6px 10px;
+    padding: 5px 10px;
     cursor: pointer;
     transition: all 0.2s;
-    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
 
   #lang-btn:hover {
@@ -115,7 +115,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
   .editor-header span {
@@ -573,14 +573,14 @@
 
 <div id="flash"></div>
 
-<!-- Language toggle button -->
-<button id="lang-btn" onclick="toggleLang()">SR</button>
-
 <h1 style="text-decoration: underline; text-underline-offset: 0.3em">MilWoT</h1>
-<p>Mil Work Timer</p>
-<p style="font-size: 0.75em; font-style: italic;">Created by Mil Stamenković</p>
+<p id="appNameTitle"><span style="color:red">Mil</span> <span style="color:red">Wo</span>rk <span style="color:red">T</span>imer</p>
+<p id="createdBy" style="font-size: 0.75em; font-style: italic;">Created by Mil Stamenković</p>
 <br>
-<p class="subtitle" id="subtitle">Work - Relax - Repeat</p>
+<div style="display:flex; align-items:center; justify-content:center; gap:30px; margin-bottom:30px;">
+  <p class="subtitle" id="subtitle" style="margin-bottom:0; line-height:1">Work - Relax - Repeat</p>
+  <button id="lang-btn" onclick="toggleLang()">SR</button>
+</div>
 
 <!-- Notification permission banner -->
 <div id="notif-banner">
@@ -592,8 +592,10 @@
 <!-- ── EDITOR ── -->
 <div id="editor">
   <div class="editor-header">
-    <span style="padding-left: 2.5%;" id="header-type">Type</span>
-    <span id="total-time-label"></span>
+    <span style="width:58px; flex-shrink:0; padding-left: 2.5%;" id="header-type">Type</span>
+    <span style="width:12px; flex-shrink:0;"></span>
+    <span id="header-name" style="flex:1; padding-left:30%;">Task name</span>
+    <span id="total-time-label" style="padding-right:7.5%;"></span>
   </div>
   <div class="task-list" id="task-list"></div>
   <div style="display:flex; gap:5px;">
@@ -645,7 +647,7 @@
       notifBtn:         'Enable',
       notifPwa:         'Install this page as PWA for easier & offline use.',
       headerType:       'Type',
-      totalTime:        'Total time',
+      totalTime:        'Time',
       btnAddTask:       '+ Task',
       btnAddPause:      '+ Pause',
       btnStart:         'START',
@@ -676,6 +678,9 @@
       breaksWord:       'breaks',
       completedWord:    'completed',
       minLabel:         'min',
+      createdBy:        'Created by Mil Stamenković',
+      appNameTitle:     '<span style="color:red">Mil</span> <span style="color:red">Wo</span>rk <span style="color:red">T</span>imer',
+      headerName:       'Task name',
     },
     sr: {
       subtitle:         'SR: Work - Relax - Repeat',       
@@ -683,7 +688,7 @@
       notifBtn:         'Одобри',                       
       notifPwa:         'Инсталирајте ову страницу као "PWA" за лакшу и офлајн употребу.', 
       headerType:       'Тип',                        
-      totalTime:        'Укупно време',                   
+      totalTime:        'Време',                   
       btnAddTask:       '+ Рад',                       
       btnAddPause:      '+ Пауза',                      
       btnStart:         'ПОЧНИ',                        
@@ -713,7 +718,10 @@
       breakWord:        'SR: break',                        
       breaksWord:       'SR: breaks',                       
       completedWord:    'SR: completed',   
-      minLabel:         'мин',                 
+      minLabel:         'мин',   
+      createdBy:        'Направио Милан Стаменковић',
+      appNameTitle:     'Миланов радни тајмер',   
+      headerName:       'Име задатка',         
     }
   };
 
@@ -739,6 +747,9 @@
     document.getElementById('btn-edit').textContent         = l.btnEdit;
     document.getElementById('done-title').textContent       = l.doneTitle;
     document.getElementById('btn-new-session').textContent  = l.btnNewSession;
+    document.getElementById('createdBy').textContent        = l.createdBy;
+    document.getElementById('appNameTitle').innerHTML       = l.appNameTitle;
+    document.getElementById('header-name').textContent      = l.headerName;
     document.documentElement.style.setProperty('--min-label', `'${l.minLabel}'`);
     // Update placeholders in existing task rows without rebuilding
     document.querySelectorAll('.task-row').forEach((row, i) => {
@@ -884,7 +895,7 @@
     const h = Math.floor(total / 60), m = total % 60;
     const value = h > 0 ? `${h}h ${m}m` : `${m}m`;
     document.getElementById('total-time-label').innerHTML =
-      `${l.totalTime}: <span style="text-transform:none">${value}</span>`;
+      `${l.totalTime} <span style="text-transform:none">${value}</span>`;
   }
 
   // ── Session ──
