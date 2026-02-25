@@ -541,8 +541,8 @@
   <div style="display:flex; gap:5px;">
     <div style="width:58px; flex-shrink:0;"></div>
     <div class="editor-actions" style="flex:1;">
-      <button class="add-task" onclick="addTask()" style="flex:1">+ Add Task</button>
-      <button class="add-task" onclick="addPause()" style="flex:1">+ Add Pause</button>
+      <button class="add-task" onclick="addTask()" style="flex:1; font-size: 0.4em">+ Add Task</button>
+      <button class="add-task" onclick="addPause()" style="flex:1; font-size: 0.4em">+ Add Pause</button>
       <button class="start-btn" onclick="startSession()" style="flex:2">START</button>
     </div>
     <div style="width:72px; flex-shrink:0;"></div>
@@ -870,6 +870,17 @@
   ];
   renderEditor();
   checkNotifBanner();
+
+// Lock minimum window size to page content
+function enforceMinSize() {
+  const minW = document.body.scrollWidth;
+  const minH = document.body.scrollHeight;
+  if (window.outerWidth < minW) window.resizeTo(minW, window.outerHeight);
+  if (window.outerHeight < minH) window.resizeTo(window.outerWidth, minH);
+}
+
+window.addEventListener('resize', enforceMinSize);
+
 </script>
 </body>
 </html>
