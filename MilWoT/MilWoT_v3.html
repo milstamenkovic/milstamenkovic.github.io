@@ -7,9 +7,9 @@
 <!-- Revised: 25.02.2026. - Ćuprija, Serbia -->
 
 <!--    TO DO    -->
-<!-- +) OFFLINE mode if possible -->
-<!-- 2) MAIN SCREEN: Entering time stays inside input field -->
-<!-- 3) MAIN SCREEN: Reorder tasks --> 
+<!-- ✔) OFFLINE mode if possible -->
+<!-- ✔) MAIN SCREEN: Entering time stays inside input field -->
+<!-- ✔) MAIN SCREEN: Drag to reorder tasks --> 
 <!-- 4) OPTIONS: Auto-language: Serbian Latin; Serbian Cyrilic; English -->
 <!-- 5) BURGER MENU: Language; Light/Dark theme  -->
 <!-- 6) TIMER SCREEN: Shorter, not taking so much height on screen -->
@@ -25,6 +25,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MilWoT</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <style>
   :root {
     /* Original color scheme with CSS variables for easy tweaking */
@@ -113,14 +114,14 @@
   .task-list {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 3px;
     margin-bottom: 10px;
   }
 
   .task-row {
     display: flex;
-    gap: 5px;
     align-items: center;
+    gap: 3px;
     animation: slideIn 0.2s ease;
   }
 
@@ -512,6 +513,47 @@
     font-size: 0.8rem;
     margin-bottom: 32px;
   }
+
+  .minutes-wrap {
+  position: relative;
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.minutes-wrap input {
+  width: 100%;
+  padding-right: 26px;
+  text-align: left;
+}
+
+.minutes-wrap::after {
+  content: 'min';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 0.5em;
+  pointer-events: none;
+}
+
+.drag-handle {
+  width: 16px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  color: var(--muted);
+  font-size: 0.5em;
+  cursor: grab;
+  user-select: none;
+  line-height: 1;
+}
+
+.drag-handle:active { cursor: grabbing; }
+
 </style>
 </head>
 <body>
@@ -540,9 +582,10 @@
   <div class="task-list" id="task-list"></div>
   <div style="display:flex; gap:5px;">
     <div style="width:58px; flex-shrink:0;"></div>
+    <div style="width:12px; flex-shrink:0;"></div>
     <div class="editor-actions" style="flex:1;">
-      <button class="add-task" onclick="addTask()" style="flex:1; font-size: 0.4em">+ Add Task</button>
-      <button class="add-task" onclick="addPause()" style="flex:1; font-size: 0.4em">+ Add Pause</button>
+      <button class="add-task" onclick="addTask()" style="flex:1">+ Task</button>
+      <button class="add-task" onclick="addPause()" style="flex:1">+ Pause</button>
       <button class="start-btn" onclick="startSession()" style="flex:2">START</button>
     </div>
     <div style="width:72px; flex-shrink:0;"></div>
@@ -597,6 +640,14 @@
       banner.classList.add('hidden');
     }
   }
+
+  Sortable.create(document.getElementById('task-list'), {
+  animation: 150,
+  onEnd: function(evt) {
+    const moved = tasks.splice(evt.oldIndex, 1)[0];
+    tasks.splice(evt.newIndex, 0, moved);
+  }
+});
 
   function requestNotifPermission() {
     Notification.requestPermission().then(() => {
@@ -667,6 +718,8 @@
     renderEditor();
   }
 
+  // Functions for Editor
+
   function renderEditor() {
     const list = document.getElementById('task-list');
     list.innerHTML = '';
@@ -674,15 +727,18 @@
       const row = document.createElement('div');
       row.className = 'task-row';
       row.innerHTML = `
-        <button class="type-toggle ${t.type === 'pause' ? 'is-pause' : ''}" onclick="toggleType(${i})">
-          ${t.type === 'pause' ? 'PAUSE' : 'TASK'}
+        <button class="type-toggle ${t.type === 'pause' ? 'is-pause' : ''}" onclick="toggleType(${i})">${t.type === 'pause' ? 'PAUSE' : 'TASK'}
         </button>
+        <div class="drag-handle">
+          <span>▲</span>
+          <span>▼</span>
+        </div>
         <input type="text" placeholder="${t.type === 'pause' ? 'Pause' : 'Task name…'}"
                value="${escHtml(t.name)}"
                class="${t.type === 'pause' ? 'pause-name' : ''}"
                oninput="tasks[${i}].name=this.value" />
-        <input type="number" min="1" max="999" value="${t.minutes}"
-               oninput="tasks[${i}].minutes=Math.max(1,parseInt(this.value)||1); renderEditor()" />
+        <div class="minutes-wrap"><input type="number" max="999" value="${t.minutes}" oninput="tasks[${i}].minutes=parseInt(this.value)||0;updateTotalLabel()" />
+        </div>
         <button class="remove" onclick="removeTask(${i})">×</button>
       `;
       list.appendChild(row);
@@ -870,16 +926,13 @@
   ];
   renderEditor();
   checkNotifBanner();
-
-// Lock minimum window size to page content
-function enforceMinSize() {
-  const minW = document.body.scrollWidth;
-  const minH = document.body.scrollHeight;
-  if (window.outerWidth < minW) window.resizeTo(minW, window.outerHeight);
-  if (window.outerHeight < minH) window.resizeTo(window.outerWidth, minH);
-}
-
-window.addEventListener('resize', enforceMinSize);
+  
+function updateTotalLabel() {
+  const total = tasks.reduce((s, t) => s + (parseInt(t.minutes) || 0), 0);
+  const h = Math.floor(total / 60), m = total % 60;
+  document.getElementById('total-time-label').textContent =
+    total > 0 ? (h > 0 ? `Total time: ${h}h ${m}m` : `Total time: ${m}m`) : '';
+};
 
 </script>
 </body>
