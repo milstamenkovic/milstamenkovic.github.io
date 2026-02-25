@@ -1,6 +1,6 @@
 <!-- MilWoT - Mil Work Timer -->
 <!-- Simple workt timer with continues timers for tasks and pauses by Mil Stamenković -->
-<!-- Version 4 -->
+<!-- Version 4 Translate -->
 <!-- © 2026 Mil Stamenković -->
 <!-- Created with help of Claude AI -->
 <!-- Created: 25.02.2026. - Ćuprija, Serbia -->
@@ -9,15 +9,13 @@
 <!--    TO DO    -->
 <!-- ✔) OFFLINE mode if possible -->
 <!-- ✔) MAIN SCREEN: Entering time stays inside input field -->
-<!-- ✔) MAIN SCREEN: Drag to reorder tasks --> 
-<!-- -) OPTIONS: Auto-language: Serbian Latin; Serbian Cyrilic; English -->
+<!-- ✔) MAIN SCREEN: Drag to reorder tasks -->
+<!-- ✔) OPTIONS: Auto-language: Serbian Latin; English -->
 <!-- 5) BURGER MENU: Language; Light/Dark theme  -->
 <!-- 6) TIMER SCREEN: Shorter, not taking so much height on screen -->
 <!-- 7) TIMER SCREEN: Reset button -->
 <!-- 8) Add EXPLANATION Page & Copyright page -->
 <!-- 9) ... -->
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -30,17 +28,6 @@
 
 <style>
   :root {
-    /* Original color scheme with CSS variables for easy tweaking */
-    /*--bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --border: #2a2a2a;
-    --accent: #e8c547;
-    --pause-accent: #6bc5a8;
-    --text: #f0ede6;
-    --muted: #666;
-    --danger: #e05252;*/
-
-    /* Mil color scheme */
     --bg: #000000;
     --surface: #1d1d1d;
     --border: #2a2a2a;
@@ -49,6 +36,7 @@
     --text: #afafaf;
     --muted: #595959;
     --danger: #646464;
+    --min-label: 'min';
   }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -94,6 +82,29 @@
     margin-bottom: 30px;
   }
 
+  /* Language toggle button */
+  #lang-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 999;
+  }
+
+  #lang-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
   /* ── EDITOR ── */
   #editor {
     width: 100%;
@@ -133,7 +144,6 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Fixed-width type toggle so all rows align */
   .type-toggle {
     width: 58px;
     flex-shrink: 0;
@@ -518,10 +528,10 @@
   }
 
   .minutes-wrap {
-  position: relative;
-  width: 72px;
-  flex-shrink: 0;
-}
+    position: relative;
+    width: 72px;
+    flex-shrink: 0;
+  }
 
   .minutes-wrap input {
     width: 100%;
@@ -530,7 +540,7 @@
   }
 
   .minutes-wrap::after {
-    content: 'min';
+    content: var(--min-label);
     position: absolute;
     right: 8px;
     top: 50%;
@@ -557,36 +567,32 @@
 
   .drag-handle:active { cursor: grabbing; }
 
-  .goog-te-banner-frame {
-    display: none !important;
-  }
-  #google_translate_element {
-    display: none;
-  }
-
 </style>
 </head>
 <body>
 
 <div id="flash"></div>
 
+<!-- Language toggle button -->
+<button id="lang-btn" onclick="toggleLang()">SR</button>
+
 <h1 style="text-decoration: underline; text-underline-offset: 0.3em">MilWoT</h1>
 <p>Mil Work Timer</p>
 <p style="font-size: 0.75em; font-style: italic;">Created by Mil Stamenković</p>
 <br>
-<p class="subtitle">Work - Relax - Repeat</p>
+<p class="subtitle" id="subtitle">Work - Relax - Repeat</p>
 
 <!-- Notification permission banner -->
-<div id="notif-banner"
-  <span>Enable notifications for this website for Alarm</span>
-  <button onclick="requestNotifPermission()">Enable</button>
-  <p style="font-style: italic;">Install this page as PWA for easier & offline use.</p>
+<div id="notif-banner">
+  <span style="text-align: center;" id="notif-text">Enable notifications for this website for Alarm</span>
+  <button onclick="requestNotifPermission()" id="notif-btn">Enable</button>
+  <p style="font-style: italic; text-align: center;" id="notif-pwa">Install this page as PWA for easier & offline use.</p>
 </div>
 
 <!-- ── EDITOR ── -->
 <div id="editor">
   <div class="editor-header">
-    <span style="padding-left: 2.5%;">Type</span>
+    <span style="padding-left: 2.5%;" id="header-type">Type</span>
     <span id="total-time-label"></span>
   </div>
   <div class="task-list" id="task-list"></div>
@@ -594,9 +600,9 @@
     <div style="width:58px; flex-shrink:0;"></div>
     <div style="width:12px; flex-shrink:0;"></div>
     <div class="editor-actions" style="flex:1;">
-      <button class="add-task" onclick="addTask()" style="flex:1">+ Task</button>
-      <button class="add-task" onclick="addPause()" style="flex:1">+ Pause</button>
-      <button class="start-btn" onclick="startSession()" style="flex:2">START</button>
+      <button class="add-task" onclick="addTask()" style="flex:1" id="btn-add-task">+ Task</button>
+      <button class="add-task" onclick="addPause()" style="flex:1" id="btn-add-pause">+ Pause</button>
+      <button class="start-btn" onclick="startSession()" style="flex:2" id="btn-start">START</button>
     </div>
     <div style="width:72px; flex-shrink:0;"></div>
     <div style="width:28px; flex-shrink:0;"></div>
@@ -608,7 +614,7 @@
   <div class="progress-bar-wrap">
     <div class="progress-bar-fill" id="progress-fill"></div>
   </div>
-  <div class="step-label">Step <span id="step-num">1</span> of <span id="step-total">1</span></div>
+  <div class="step-label" id="step-label-text">Step <span id="step-num">1</span> of <span id="step-total">1</span></div>
   <div class="current-task-name" id="current-name">Task</div>
   <div class="type-badge" id="type-badge">TASK</div>
   <div class="clock" id="clock">00:00</div>
@@ -617,20 +623,138 @@
     <button class="ctrl-btn" id="pause-resume-btn" onclick="togglePause()">PAUSE</button>
     <button class="ctrl-btn primary" id="next-btn" onclick="nextStep()">SKIP →</button>
   </div>
-  <div class="queue-title">Up Next</div>
+  <div class="queue-title" id="queue-title">Up Next</div>
   <div class="queue" id="queue"></div>
-  <button class="edit-link" onclick="backToEditor()">← Edit session</button>
+  <button class="edit-link" onclick="backToEditor()" id="btn-edit">← Edit session</button>
 </div>
 
 <!-- ── DONE ── -->
 <div id="done-view">
-  <div class="done-big">Session Complete</div>
+  <div class="done-big" id="done-title">Session Complete</div>
   <div class="done-sub" id="done-stats"></div>
-  <button class="start-btn" onclick="backToEditor()">NEW SESSION</button>
+  <button class="start-btn" onclick="backToEditor()" id="btn-new-session">NEW SESSION</button>
 </div>
 
 <script>
-  
+
+  // ── Language data ──
+  const lang = {
+    en: {
+      subtitle:         'Work - Relax - Repeat',
+      notifText:        'Enable notifications for this website for Alarm',
+      notifBtn:         'Enable',
+      notifPwa:         'Install this page as PWA for easier & offline use.',
+      headerType:       'Type',
+      totalTime:        'Total time',
+      btnAddTask:       '+ Task',
+      btnAddPause:      '+ Pause',
+      btnStart:         'START',
+      stepLabel:        'Step',
+      stepOf:           'of',
+      badgeTask:        'TASK',
+      badgeBreak:       'BREAK',
+      btnPause:         'PAUSE',
+      btnResume:        'RESUME',
+      btnSkip:          'SKIP →',
+      btnFinish:        'FINISH',
+      queueTitle:       'Up Next',
+      btnEdit:          '← Edit session',
+      doneTitle:        'Session Complete',
+      btnNewSession:    'NEW SESSION',
+      remainingSession: 'remaining in session',
+      taskLabel:        'TASK',
+      pauseLabel:       'PAUSE',
+      taskPlaceholder:  'Task name…',
+      pausePlaceholder: 'Pause',
+      notifUpNext:      'Up next',
+      notifDone:        'Session complete!',
+      notifFinishTitle: '✔ Session Complete!',
+      notifFinishBody:  'tasks finished. Great work!',
+      taskWord:         'task',
+      tasksWord:        'tasks',
+      breakWord:        'break',
+      breaksWord:       'breaks',
+      completedWord:    'completed',
+      minLabel:         'min',
+    },
+    sr: {
+      subtitle:         'SR: Work - Relax - Repeat',       
+      notifText:        'Одобри нотификације за овај вебсајт за аларм.',      
+      notifBtn:         'Одобри',                       
+      notifPwa:         'Инсталирајте ову страницу као "PWA" за лакшу и офлајн употребу.', 
+      headerType:       'Тип',                        
+      totalTime:        'Укупно време',                   
+      btnAddTask:       '+ Рад',                       
+      btnAddPause:      '+ Пауза',                      
+      btnStart:         'ПОЧНИ',                        
+      stepLabel:        'SR: Step',                         
+      stepOf:           'SR: of',                           
+      badgeTask:        'SR: Задатак',                         
+      badgeBreak:       'SR: BREAK',                        
+      btnPause:         'SR: PAUSE',                        
+      btnResume:        'SR: RESUME',                       
+      btnSkip:          'SR: SKIP →',                       
+      btnFinish:        'SR: FINISH',                       
+      queueTitle:       'SR: Up Next',                      
+      btnEdit:          'SR: ← Edit session',               
+      doneTitle:        'SR: Session Complete',             
+      btnNewSession:    'SR: NEW SESSION',                  
+      remainingSession: 'SR: remaining in session',         
+      taskLabel:        'РАД',                         
+      pauseLabel:       'ПАУЗА',                        
+      taskPlaceholder:  'Рад',                   
+      pausePlaceholder: 'Пауза',                        
+      notifUpNext:      'SR: Up next',                      
+      notifDone:        'SR: Session complete!',            
+      notifFinishTitle: 'SR: ✔ Session Complete!',         
+      notifFinishBody:  'SR: tasks finished. Great work!',  
+      taskWord:         'Рад',                         
+      tasksWord:        'Рад',                        
+      breakWord:        'SR: break',                        
+      breaksWord:       'SR: breaks',                       
+      completedWord:    'SR: completed',   
+      minLabel:         'мин',                 
+    }
+  };
+
+  let currentLang = 'en';
+
+  function toggleLang() {
+    currentLang = currentLang === 'en' ? 'sr' : 'en';
+    document.getElementById('lang-btn').textContent = currentLang === 'en' ? 'SR' : 'EN';
+    applyLang();
+  }
+
+  function applyLang() {
+    const l = lang[currentLang];
+    document.getElementById('subtitle').textContent         = l.subtitle;
+    document.getElementById('notif-text').textContent       = l.notifText;
+    document.getElementById('notif-btn').textContent        = l.notifBtn;
+    document.getElementById('notif-pwa').textContent        = l.notifPwa;
+    document.getElementById('header-type').textContent      = l.headerType;
+    document.getElementById('btn-add-task').textContent     = l.btnAddTask;
+    document.getElementById('btn-add-pause').textContent    = l.btnAddPause;
+    document.getElementById('btn-start').textContent        = l.btnStart;
+    document.getElementById('queue-title').textContent      = l.queueTitle;
+    document.getElementById('btn-edit').textContent         = l.btnEdit;
+    document.getElementById('done-title').textContent       = l.doneTitle;
+    document.getElementById('btn-new-session').textContent  = l.btnNewSession;
+    document.documentElement.style.setProperty('--min-label', `'${l.minLabel}'`);
+    // Update placeholders in existing task rows without rebuilding
+    document.querySelectorAll('.task-row').forEach((row, i) => {
+      const input = row.querySelector('input[type="text"]');
+      if (input) {
+        const isPause = tasks[i] && tasks[i].type === 'pause';
+        input.placeholder = isPause ? l.pausePlaceholder : l.taskPlaceholder;
+      }
+      const toggle = row.querySelector('.type-toggle');
+      if (toggle && tasks[i]) {
+        toggle.textContent = tasks[i].type === 'pause' ? l.pauseLabel : l.taskLabel;
+      }
+    });
+    updateTotalLabel();
+  }
+
   // ── State ──
   let tasks = [];
   let currentStep = 0;
@@ -651,14 +775,6 @@
       banner.classList.add('hidden');
     }
   }
-
-  Sortable.create(document.getElementById('task-list'), {
-  animation: 150,
-  onEnd: function(evt) {
-    const moved = tasks.splice(evt.oldIndex, 1)[0];
-    tasks.splice(evt.newIndex, 0, moved);
-  }
-});
 
   function requestNotifPermission() {
     Notification.requestPermission().then(() => {
@@ -713,7 +829,7 @@
     renderEditor();
   }
 
-  function addPause(name = 'Pause', minutes = 5) {
+  function addPause(name = '', minutes = 5) {
     tasks.push({ name, minutes, type: 'pause' });
     renderEditor();
   }
@@ -725,58 +841,67 @@
 
   function toggleType(i) {
     tasks[i].type = tasks[i].type === 'task' ? 'pause' : 'task';
-    if (tasks[i].type === 'pause' && !tasks[i].name.trim()) tasks[i].name = 'Pause';
     renderEditor();
   }
 
-  // Functions for Editor
-
   function renderEditor() {
+    const l = lang[currentLang];
     const list = document.getElementById('task-list');
     list.innerHTML = '';
     tasks.forEach((t, i) => {
       const row = document.createElement('div');
       row.className = 'task-row';
       row.innerHTML = `
-        <button class="type-toggle ${t.type === 'pause' ? 'is-pause' : ''}" onclick="toggleType(${i})">${t.type === 'pause' ? 'PAUSE' : 'TASK'}
+        <button class="type-toggle ${t.type === 'pause' ? 'is-pause' : ''}" onclick="toggleType(${i})">
+          ${t.type === 'pause' ? l.pauseLabel : l.taskLabel}
         </button>
         <div class="drag-handle">
           <span>▲</span>
           <span>▼</span>
         </div>
-        <input type="text" placeholder="${t.type === 'pause' ? 'Pause' : 'Task name…'}"
+        <input type="text" placeholder="${t.type === 'pause' ? l.pausePlaceholder : l.taskPlaceholder}"
                value="${escHtml(t.name)}"
                class="${t.type === 'pause' ? 'pause-name' : ''}"
                oninput="tasks[${i}].name=this.value" />
-        <div class="minutes-wrap"><input type="number" max="999" value="${t.minutes}" oninput="tasks[${i}].minutes=parseInt(this.value)||0;updateTotalLabel()" />
+        <div class="minutes-wrap">
+          <input type="number" max="999" value="${t.minutes}"
+                 oninput="tasks[${i}].minutes=parseInt(this.value)||0;updateTotalLabel()" />
         </div>
         <button class="remove" onclick="removeTask(${i})">×</button>
       `;
       list.appendChild(row);
     });
-
-    const total = tasks.reduce((s, t) => s + (parseInt(t.minutes) || 0), 0);
-    const h = Math.floor(total / 60), m = total % 60;
-    document.getElementById('total-time-label').textContent =
-      total > 0 ? (h > 0 ? `Total time: ${h}h ${m}m` : `Total time:${m}m`) : '';
+    updateTotalLabel();
   }
 
   function escHtml(s) {
     return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
+
+  function updateTotalLabel() {
+    const l = lang[currentLang];
+    const total = tasks.reduce((s, t) => s + (parseInt(t.minutes) || 0), 0);
+    const h = Math.floor(total / 60), m = total % 60;
+    const value = h > 0 ? `${h}h ${m}m` : `${m}m`;
+    document.getElementById('total-time-label').innerHTML =
+      `${l.totalTime}: <span style="text-transform:none">${value}</span>`;
+  }
+
   // ── Session ──
   function startSession() {
+    const l = lang[currentLang];
     const valid = tasks.filter(t => t.minutes > 0);
     if (valid.length === 0) return;
-    tasks.forEach((t, i) => { if (!t.name.trim()) t.name = t.type === 'pause' ? 'Pause' : `Task ${i+1}`; });
+    tasks.forEach((t, i) => {
+      if (!t.name.trim()) t.name = t.type === 'pause' ? l.pausePlaceholder : `${l.taskLabel} ${i+1}`;
+    });
 
     currentStep = 0;
     totalSecondsLeft = tasks.reduce((s, t) => s + t.minutes * 60, 0);
 
     document.getElementById('editor').style.display = 'none';
     document.getElementById('done-view').style.display = 'none';
-    const tv = document.getElementById('timer-view');
-    tv.style.display = 'flex';
+    document.getElementById('timer-view').style.display = 'flex';
 
     document.getElementById('step-total').textContent = tasks.length;
     renderQueue();
@@ -784,6 +909,7 @@
   }
 
   function startStep() {
+    const l = lang[currentLang];
     const t = tasks[currentStep];
     stepDuration = t.minutes * 60;
     secondsLeft = stepDuration;
@@ -795,17 +921,24 @@
     nameEl.textContent = t.name;
     nameEl.classList.toggle('is-pause', isPauseStep);
 
-    document.getElementById('type-badge').textContent = isPauseStep ? 'BREAK' : 'TASK';
+    document.getElementById('type-badge').textContent = isPauseStep ? l.badgeBreak : l.badgeTask;
     document.getElementById('step-num').textContent = currentStep + 1;
+
+    // Update step label text
+    document.getElementById('step-label-text').innerHTML =
+      `${l.stepLabel} <span id="step-num">${currentStep + 1}</span> ${l.stepOf} <span id="step-total">${tasks.length}</span>`;
 
     const fill = document.getElementById('progress-fill');
     fill.classList.toggle('is-pause', isPauseStep);
     fill.style.width = '0%';
 
-    document.getElementById('pause-resume-btn').textContent = 'PAUSE';
+    const btn = document.getElementById('pause-resume-btn');
+    btn.textContent = l.btnPause;
+    btn.style.borderColor = 'green';
+    btn.style.color = 'green';
 
-    const nextBtn = document.getElementById('next-btn');
-    nextBtn.textContent = currentStep < tasks.length - 1 ? 'SKIP →' : 'FINISH';
+    document.getElementById('next-btn').textContent =
+      currentStep < tasks.length - 1 ? l.btnSkip : l.btnFinish;
 
     updateClock();
     renderQueue();
@@ -830,13 +963,13 @@
       alertSound();
       flash(tasks[currentStep].type === 'pause' ? 'rgba(107,197,168,0.2)' : 'rgba(232,197,71,0.2)');
 
-      // Windows notification
+      const l = lang[currentLang];
       const finishedName = tasks[currentStep].name;
       const nextTask = tasks[currentStep + 1];
       const notifBody = nextTask
-        ? `Up next: ${nextTask.name} (${nextTask.minutes} min)`
-        : 'Session complete!';
-      sendNotification(`⏱ ${finishedName} done`, notifBody);
+        ? `${l.notifUpNext}: ${nextTask.name} (${nextTask.minutes} min)`
+        : l.notifDone;
+      sendNotification(`⏱ ${finishedName}`, notifBody);
 
       setTimeout(() => {
         if (currentStep < tasks.length - 1) {
@@ -851,11 +984,11 @@
   }
 
   function updateClock() {
+    const l = lang[currentLang];
     const m = Math.floor(secondsLeft / 60);
     const s = secondsLeft % 60;
-    const str = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     const clock = document.getElementById('clock');
-    clock.textContent = str;
+    clock.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     clock.classList.toggle('warning', secondsLeft <= 60 && secondsLeft > 0 && tasks[currentStep].type !== 'pause');
     clock.classList.toggle('is-pause', tasks[currentStep].type === 'pause');
 
@@ -864,17 +997,18 @@
     const tm = Math.floor((tr % 3600) / 60);
     const ts = tr % 60;
     const totalStr = th > 0
-      ? `${th}h ${tm}m remaining in session`
-      : `${tm}m ${String(ts).padStart(2,'0')}s remaining in session`;
+      ? `${th}h ${tm}m ${l.remainingSession}`
+      : `${tm}m ${String(ts).padStart(2,'0')}s ${l.remainingSession}`;
     document.getElementById('total-left').textContent = totalStr;
   }
 
   function togglePause() {
+    const l = lang[currentLang];
     isPaused = !isPaused;
     const btn = document.getElementById('pause-resume-btn');
-    btn.textContent = isPaused ? 'RESUME' : 'PAUSE';
+    btn.textContent       = isPaused ? l.btnResume : l.btnPause;
     btn.style.borderColor = isPaused ? 'red' : 'green';
-    btn.style.color = isPaused ? 'green' : 'red';
+    btn.style.color       = isPaused ? 'red' : 'green';
     beep(isPaused ? 440 : 660, 0.08);
   }
 
@@ -890,15 +1024,15 @@
   }
 
   function finishSession() {
+    const l = lang[currentLang];
     clearInterval(timerInterval);
     document.getElementById('timer-view').style.display = 'none';
-    const dv = document.getElementById('done-view');
-    dv.style.display = 'flex';
-    const taskCount = tasks.filter(t => t.type === 'task').length;
+    document.getElementById('done-view').style.display = 'flex';
+    const taskCount  = tasks.filter(t => t.type === 'task').length;
     const pauseCount = tasks.filter(t => t.type === 'pause').length;
     document.getElementById('done-stats').textContent =
-      `${taskCount} task${taskCount !== 1 ? 's' : ''} · ${pauseCount} break${pauseCount !== 1 ? 's' : ''} completed`;
-    sendNotification('✔ Session Complete!', `${taskCount} tasks finished. Great work!`);
+      `${taskCount} ${taskCount !== 1 ? l.tasksWord : l.taskWord} · ${pauseCount} ${pauseCount !== 1 ? l.breaksWord : l.breakWord} ${l.completedWord}`;
+    sendNotification(l.notifFinishTitle, `${taskCount} ${l.notifFinishBody}`);
     alertSound(); setTimeout(alertSound, 500);
   }
 
@@ -928,21 +1062,23 @@
 
   // ── Init ──
   tasks = [
-    { name: 'Task 1', minutes: 30, type: 'task' },
-    { name: 'Pause',  minutes: 5,  type: 'pause' },
-    { name: 'Task 2', minutes: 25, type: 'task' },
-    { name: 'Task 3', minutes: 15, type: 'task' },
-    { name: 'Pause',  minutes: 5,  type: 'pause' },
+    { name: '...', minutes: 0, type: 'task' },
+    { name: '...',  minutes: 0,  type: 'pause' },
+    { name: '...', minutes: 0, type: 'task' },
+    { name: '...', minutes: 0, type: 'task' },
+    { name: '...',  minutes: 0,  type: 'pause' },
   ];
   renderEditor();
   checkNotifBanner();
-  
-function updateTotalLabel() {
-  const total = tasks.reduce((s, t) => s + (parseInt(t.minutes) || 0), 0);
-  const h = Math.floor(total / 60), m = total % 60;
-  document.getElementById('total-time-label').textContent =
-    total > 0 ? (h > 0 ? `Total time: ${h}h ${m}m` : `Total time: ${m}m`) : '';
-};
+
+  Sortable.create(document.getElementById('task-list'), {
+    handle: '.drag-handle',
+    animation: 150,
+    onEnd: function(evt) {
+      const moved = tasks.splice(evt.oldIndex, 1)[0];
+      tasks.splice(evt.newIndex, 0, moved);
+    }
+  });
 
 </script>
 </body>
