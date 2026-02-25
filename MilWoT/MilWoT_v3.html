@@ -74,10 +74,11 @@
 
   h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 1rem;
-    letter-spacing: -0.5px;
-    margin-bottom: 8px;
-    color: var(--text);
+    font-size: 2em;
+    letter-spacing: 0.5em;
+    font-weight: 1000;
+    margin-bottom: 0.5em;
+    color: #ff0000;
   }
 
   .subtitle {
@@ -517,9 +518,9 @@
 
 <div id="flash"></div>
 
-<h1 style="letter-spacing: 0.3em; text-decoration: underline; text-underline-offset: 0.3em; font-weight: 1000;">MilWoT</h1>
-<p style="font-size: 0.5em">Mil Work Timer</p>
-<p style="font-size: 0.5em; font-style: italic;">Created by Mil Stamenković</p>
+<h1 style="text-decoration: underline; text-underline-offset: 0.3em">MilWoT</h1>
+<p>Mil Work Timer</p>
+<p style="font-size: 0.75em; font-style: italic;">Created by Mil Stamenković</p>
 <br>
 <p class="subtitle">Work - Relax - Repeat</p>
 
@@ -527,20 +528,25 @@
 <div id="notif-banner"
   <span>Enable notifications for this website for Alarm</span>
   <button onclick="requestNotifPermission()">Enable</button>
-  <p style="font-style: italic;">Install this page as PWA for easier use.</p>
+  <p style="font-style: italic;">Install this page as PWA for easier & offline use.</p>
 </div>
 
 <!-- ── EDITOR ── -->
 <div id="editor">
   <div class="editor-header">
-    <span>Session</span>
+    <span style="padding-left: 2.5%;">Type</span>
     <span id="total-time-label"></span>
   </div>
   <div class="task-list" id="task-list"></div>
-  <div class="editor-actions">
-    <button class="add-task" onclick="addTask()">+ Add Task</button>
-    <button class="add-task" onclick="addPause()" style="flex:0.6">+ Add Pause</button>
-    <button class="start-btn" onclick="startSession()">START</button>
+  <div style="display:flex; gap:5px;">
+    <div style="width:58px; flex-shrink:0;"></div>
+    <div class="editor-actions" style="flex:1;">
+      <button class="add-task" onclick="addTask()" style="flex:1">+ Add Task</button>
+      <button class="add-task" onclick="addPause()" style="flex:1">+ Add Pause</button>
+      <button class="start-btn" onclick="startSession()" style="flex:2">START</button>
+    </div>
+    <div style="width:72px; flex-shrink:0;"></div>
+    <div style="width:28px; flex-shrink:0;"></div>
   </div>
 </div>
 
@@ -685,7 +691,7 @@
     const total = tasks.reduce((s, t) => s + (parseInt(t.minutes) || 0), 0);
     const h = Math.floor(total / 60), m = total % 60;
     document.getElementById('total-time-label').textContent =
-      total > 0 ? (h > 0 ? `${h}h ${m}m total` : `${m}m total`) : '';
+      total > 0 ? (h > 0 ? `Total time: ${h}h ${m}m` : `Total time:${m}m`) : '';
   }
 
   function escHtml(s) {
@@ -826,7 +832,7 @@
     const pauseCount = tasks.filter(t => t.type === 'pause').length;
     document.getElementById('done-stats').textContent =
       `${taskCount} task${taskCount !== 1 ? 's' : ''} · ${pauseCount} break${pauseCount !== 1 ? 's' : ''} completed`;
-    sendNotification('🎉 Session Complete!', `${taskCount} tasks finished. Great work!`);
+    sendNotification('✔ Session Complete!', `${taskCount} tasks finished. Great work!`);
     alertSound(); setTimeout(alertSound, 500);
   }
 
