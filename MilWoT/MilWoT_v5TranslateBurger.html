@@ -1289,9 +1289,6 @@
     timerInterval = setInterval(tick, 1000);
   }
 
-  alert('About to send notification!');
-  sendNotification(`⏱ ${finishedName}`, notifBody);
-
   function tick() {
     if (isPaused) return;
     secondsLeft--;
@@ -1314,6 +1311,7 @@
       const notifBody = nextTask
         ? `${l.notifUpNext}: ${nextTask.name} (${nextTask.minutes} min)`
         : l.notifDone;
+      alert('About to send notification!');
       sendNotification(`⏱ ${finishedName}`, notifBody);
 
       setTimeout(() => {
