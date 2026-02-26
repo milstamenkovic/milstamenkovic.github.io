@@ -12,12 +12,13 @@
 <!--  ✔) MAIN SCREEN: Drag to reorder tasks -->
 <!--  ✔) OPTIONS: Auto-language: Serbian Latin; English -->
 <!--  ✔) BURGER MENU: Language; Light/Dark theme  -->
+<!--  ✔) POP-UP menu for LANG, COPYRIGHT, COLOR, etc. -->
 <!--  6) TIMER SCREEN: Shorter, not taking so much height on screen -->
 <!--  7) TIMER SCREEN: Reset button -->
 <!--  8) Add EXPLANATION Page & Copyright page -->
-<!--  9) POP-UP menu for LANG, COPYRIGHT, COLOR, etc. -->
+<!--  9) Creat LOGO and ICONS with LOGO -->
 <!-- 10) FUTURE - Ambient sounds. Rain, hum, keyboards typing, etc. -->
-<!-- 11) ... -->
+<!-- 10) ... -->
 <!--  *) Finish it as fully-offline-any-device-PWA -->
 
 <!DOCTYPE html>
@@ -1031,7 +1032,7 @@
       backLabel:        '← Назад',             
       subpanelBack:     '← Назад',
       readmeTitle:      'Упутство',
-      readmeBody:       '"MilWoT" је једноставан тајмер за рад.\n\nДодајте задатке и паузе, подесите њихова трајања, затим кликните СТАРТ. Тајмер иде кроз сесију аутоматски и обавештава Вас када се сваки корак заврши.\n\nСавет: Користит ▲▼ ручице да промените редослед.\nКликните на ЗАДАТАК/ПАУЗА да промените тип.',
+      readmeBody:       '"MilWoT" је једноставан тајмер за рад.\n\nДодајте задатке и паузе, подесите њихова трајања, затим кликните СТАРТ. Тајмер иде кроз сесију аутоматски и обавештава Вас када се сваки корак заврши.\n\nСавет: Користит ▲▼ ручице да промените редослед.\nКликните на РАД/ПАУЗА да промените тип.',
       copyrightTitle:   'Ауторска права',
       copyrightBody:    '© 2026 Милан Стаменковић\nЋуприја, Србија\n\nНаправљено уз помоћ бесплатног "Claude AI".\nСва права задржана.',
     }
@@ -1287,6 +1288,9 @@
     clearInterval(timerInterval);
     timerInterval = setInterval(tick, 1000);
   }
+
+  alert('About to send notification!');
+  sendNotification(`⏱ ${finishedName}`, notifBody);
 
   function tick() {
     if (isPaused) return;
