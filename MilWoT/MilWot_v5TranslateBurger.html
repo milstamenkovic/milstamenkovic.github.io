@@ -1,0 +1,1423 @@
+<!-- MilWoT - Mil Work Timer -->
+<!-- Simple workt timer with continues timers for tasks and pauses by Mil Stamenković -->
+<!-- © 2026 Mil Stamenković -->
+<!-- Version 5 Translate and Burger Menu -->
+<!-- Created with help of Free Claude AI -->
+<!-- Created: 25.02.2026. - Ćuprija, Serbia -->
+<!-- Revised: 26.02.2026. - Ćuprija, Serbia -->
+
+<!--    TO DO    -->
+<!-- ✔) OFFLINE mode if possible -->
+<!-- ✔) MAIN SCREEN: Entering time stays inside input field -->
+<!-- ✔) MAIN SCREEN: Drag to reorder tasks -->
+<!-- ✔) OPTIONS: Auto-language: Serbian Latin; English -->
+<!-- ✔) BURGER MENU: Language; Light/Dark theme  -->
+<!-- 6) TIMER SCREEN: Shorter, not taking so much height on screen -->
+<!-- 7) TIMER SCREEN: Reset button -->
+<!-- 8) Add EXPLANATION Page & Copyright page -->
+<!-- 9) ... -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MilWoT</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<style>
+  :root {
+    --bg: #000000;
+    --surface: #1d1d1d;
+    --border: #2a2a2a;
+    --accent: #960000;
+    --pause-accent: #960000;
+    --text: #afafaf;
+    --muted: #595959;
+    --danger: #646464;
+    --min-label: 'min';
+  }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: fit-content;
+    min-width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    position: relative;
+    overflow-x: hidden;
+    top: 0 !important;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(232,197,71,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(107,197,168,0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2em;
+    letter-spacing: 0.5em;
+    font-weight: 1000;
+    margin-bottom: 0.5em;
+    color: #ff0000;
+  }
+
+  .subtitle {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+  }
+
+  /* Language toggle button */
+  #lang-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  #lang-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── EDITOR ── */
+  #editor {
+    width: 100%;
+    max-width: 540px;
+  }
+
+  .editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .editor-header span {
+    font-size: 0.65em;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 10px;
+  }
+
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .type-toggle {
+    width: 58px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65em;
+    padding: 5px 0;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .type-toggle.is-pause {
+    color: var(--pause-accent);
+  }
+
+  .task-row input[type="text"] {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65em;
+    padding: 5px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .task-row input[type="text"]:focus {
+    border-color: var(--accent);
+  }
+
+  .task-row input[type="text"].pause-name {
+    color: var(--pause-accent);
+  }
+
+  .task-row input[type="number"] {
+    width: 72px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 5px 10px;
+    outline: none;
+    text-align: center;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+
+  .task-row input[type="number"]::-webkit-outer-spin-button,
+  .task-row input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .task-row input[type="number"]:focus {
+    border-color: var(--accent);
+  }
+
+  .task-row button.remove {
+    width: 28px;
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 4px 0;
+    border-radius: 4px;
+    text-align: center;
+    transition: color 0.2s;
+  }
+
+  .task-row button.remove:hover { color: var(--danger); }
+
+  .editor-actions {
+    display: flex;
+    height: 30px;
+    gap: 8px;
+  }
+
+  button.add-task {
+    flex: 1;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  button.add-task:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  button.start-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    color: #0f0f0f;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 10px 28px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: opacity 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  button.start-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  button.start-btn:active { transform: translateY(0); }
+
+  /* Notification permission banner */
+  #notif-banner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 240px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 6px;
+    margin-bottom: 10px;
+    font-size: 0.5rem;
+    color: var(--muted);
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+  }
+
+  #notif-banner button {
+    background: green;
+    border: none;
+    border-radius: 5px;
+    color: #0f0f0f;
+    font-family: 'DM Mono', monospace;
+    font-size: 1em;
+    letter-spacing: 1px;
+    padding: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  #notif-banner.hidden { display: none !important; }
+
+  /* ── TIMER VIEW ── */
+  #timer-view {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .progress-bar-wrap {
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 40px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 1s linear, background 0.5s;
+    width: 0%;
+  }
+
+  .progress-bar-fill.is-pause {
+    background: var(--pause-accent);
+  }
+
+  .step-label {
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .step-label span {
+    color: var(--accent);
+  }
+
+  .current-task-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    text-align: center;
+    margin-bottom: 8px;
+    line-height: 1.2;
+    transition: color 0.4s;
+  }
+
+  .current-task-name.is-pause {
+    color: var(--pause-accent);
+  }
+
+  .type-badge {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  .clock {
+    font-size: 5.5rem;
+    font-weight: 500;
+    letter-spacing: -4px;
+    line-height: 1;
+    margin-bottom: 12px;
+    transition: color 0.3s;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .clock.warning { color: var(--danger); }
+  .clock.is-pause { color: var(--pause-accent); }
+
+  .total-left {
+    font-size: 0.5em;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 48px;
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .ctrl-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .ctrl-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0f0f0f;
+  }
+
+  .ctrl-btn.primary:hover {
+    opacity: 0.85;
+    color: #0f0f0f;
+  }
+
+  /* Queue */
+  .queue-title {
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    align-self: flex-start;
+  }
+
+  .queue {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .queue-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 0.8rem;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+  }
+
+  .queue-item.current {
+    opacity: 1;
+    border-color: var(--accent);
+  }
+
+  .queue-item.current.is-pause {
+    border-color: var(--pause-accent);
+  }
+
+  .queue-item.done {
+    opacity: 0.2;
+    text-decoration: line-through;
+  }
+
+  .queue-item-name { flex: 1; }
+
+  .queue-item-dur {
+    color: var(--muted);
+    font-size: 0.7rem;
+  }
+
+  /* Flash overlay */
+  #flash {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 100;
+  }
+
+  #flash.active { opacity: 1; }
+
+  .edit-link {
+    margin-top: 32px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .edit-link:hover { color: var(--text); }
+
+  /* Done screen */
+  #done-view {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .done-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    margin-bottom: 12px;
+    color: var(--accent);
+  }
+
+  .done-sub {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-bottom: 32px;
+  }
+
+  .minutes-wrap {
+    position: relative;
+    width: 72px;
+    flex-shrink: 0;
+  }
+
+  .minutes-wrap input {
+    width: 100%;
+    padding-right: 26px;
+    text-align: left;
+  }
+
+  .minutes-wrap::after {
+    content: var(--min-label);
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 0.5em;
+    pointer-events: none;
+  }
+
+  .drag-handle {
+    width: 16px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    color: var(--muted);
+    font-size: 0.5em;
+    cursor: grab;
+    user-select: none;
+    line-height: 1;
+  }
+
+  .drag-handle:active { cursor: grabbing; }
+
+  /* ── BURGER BUTTON ── */
+  #burger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 4px;
+    flex-shrink: 0;
+  }
+
+  #burger-btn span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--muted);
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+
+  #burger-btn:hover span { background: var(--accent); }
+
+  /* ── MENU OVERLAY ── */
+  #menu-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #menu-overlay.open { display: flex; }
+
+  #menu-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    animation: popIn 0.15s ease;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  #menu-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 1.3rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  #menu-close:hover { color: var(--accent); }
+
+  .menu-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+
+  .menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 0;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: var(--text);
+    border: none;
+    background: none;
+    width: 100%;
+    font-family: 'DM Mono', monospace;
+    text-align: left;
+  }
+
+  .menu-item:hover { background: var(--border); }
+
+  .menu-item-left { display: flex; align-items: center; gap: 10px; }
+
+  .menu-item.placeholder {
+    opacity: 0.35;
+    cursor: default;
+    font-style: italic;
+  }
+
+  .menu-item.placeholder:hover { background: none; }
+
+  /* Toggle switch */
+  .toggle-switch { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+  .toggle-switch input { display: none; }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 20px;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: var(--muted);
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  .toggle-switch input:checked + .toggle-track { background: var(--accent); }
+  .toggle-switch input:checked + .toggle-track::after {
+    transform: translateX(16px);
+    background: #fff;
+  }
+
+  /* Subpanel */
+  #menu-subpanel { display: none; flex-direction: column; gap: 10px; }
+  #menu-subpanel.open { display: flex; }
+  #menu-main { display: flex; flex-direction: column; gap: 6px; }
+  #menu-main.hidden { display: none; }
+
+  .subpanel-back {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+    margin-bottom: 4px;
+    transition: color 0.2s;
+  }
+
+  .subpanel-back:hover { color: var(--accent); }
+
+  .subpanel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .subpanel-body {
+    font-size: 0.7rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  /* Light theme */
+  body.light {
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --border: #dddddd;
+    --text: #2a2a2a;
+    --muted: #999999;
+  }
+
+
+</style>
+</head>
+<body>
+
+<div id="flash"></div>
+
+<!-- ── BURGER MENU OVERLAY ── -->
+<div id="menu-overlay" onclick="handleOverlayClick(event)">
+  <div id="menu-panel">
+    <button id="menu-close" onclick="closeMenu()">×</button>
+    <div id="menu-main">
+      <div class="menu-heading">MilWoT</div>
+      <div class="menu-divider"></div>
+      <div class="menu-item">
+        <div class="menu-item-left"><span>🌐</span><span id="menu-lang-label">Serbian / Srpski</span></div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="lang-toggle" onchange="menuToggleLang()">
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+      <div class="menu-item">
+      <div class="menu-item-left">
+        <span id="menu-theme-icon">☀️</span>
+        <span id="menu-theme-label">Light theme</span>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
+        <div class="toggle-track"></div>
+      </label>
+    </div>
+      <div class="menu-divider"></div>
+      <button class="menu-item" onclick="showSubpanel('readme')">
+        <div class="menu-item-left"><span>📖</span><span id="menu-readme-label">Read Me</span></div>
+        <span style="color:var(--muted)">›</span>
+      </button>
+      <button class="menu-item" onclick="showSubpanel('copyright')">
+        <div class="menu-item-left"><span>©</span><span id="menu-copyright-label">Copyright</span></div>
+        <span style="color:var(--muted)">›</span>
+      </button>
+      <div class="menu-divider"></div>
+      <div class="menu-item placeholder">
+        <div class="menu-item-left"><span>⚙️</span><span id="menu-placeholder-label">Coming soon…</span></div>
+      </div>
+    </div>
+    <div id="menu-subpanel">
+      <button id="subpanel-back" class="subpanel-back" onclick="showMenuMain()">← Back</button>
+      <div class="subpanel-title" id="subpanel-title"></div>
+      <div class="subpanel-body" id="subpanel-body"></div>
+    </div>
+  </div>
+</div>
+
+<h1 style="text-decoration: underline; text-underline-offset: 0.3em">MilWoT</h1>
+<p id="appNameTitle"><span style="color:red">Mil</span> <span style="color:red">Wo</span>rk <span style="color:red">T</span>imer</p>
+<p id="createdBy" style="font-size: 0.75em; font-style: italic;">Created by Mil Stamenković</p>
+<br>
+<div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:30px;">
+  <p class="subtitle" id="subtitle" style="margin-bottom:0; line-height:1">Work - Relax - Repeat</p>
+  <button id="burger-btn" onclick="openMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<!-- Notification permission banner -->
+<div id="notif-banner">
+  <span style="text-align: center;" id="notif-text">Enable notifications for this website for Alarm</span>
+  <button onclick="requestNotifPermission()" id="notif-btn">Enable</button>
+  <p style="font-style: italic; text-align: center;" id="notif-pwa">Install this page as PWA for easier & offline use.</p>
+</div>
+
+<!-- ── EDITOR ── -->
+<div id="editor">
+  <div class="editor-header">
+    <span style="width:58px; flex-shrink:0; padding-left: 2.5%;" id="header-type">Type</span>
+    <span style="width:12px; flex-shrink:0;"></span>
+    <span id="header-name" style="flex:1; padding-left:30%;">Task name</span>
+    <span id="total-time-label" style="padding-right:7.5%;"></span>
+  </div>
+  <div class="task-list" id="task-list"></div>
+  <div style="display:flex; gap:5px;">
+    <div style="width:58px; flex-shrink:0;"></div>
+    <div style="width:12px; flex-shrink:0;"></div>
+    <div class="editor-actions" style="flex:1;">
+      <button class="add-task" onclick="addTask()" style="flex:1" id="btn-add-task">+ Task</button>
+      <button class="add-task" onclick="addPause()" style="flex:1" id="btn-add-pause">+ Pause</button>
+      <button class="start-btn" onclick="startSession()" style="flex:2" id="btn-start">START</button>
+    </div>
+    <div style="width:72px; flex-shrink:0;"></div>
+    <div style="width:28px; flex-shrink:0;"></div>
+  </div>
+</div>
+
+<!-- ── TIMER ── -->
+<div id="timer-view">
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill"></div>
+  </div>
+  <div class="step-label" id="step-label-text">Step <span id="step-num">1</span> of <span id="step-total">1</span></div>
+  <div class="current-task-name" id="current-name">Task</div>
+  <div class="type-badge" id="type-badge">TASK</div>
+  <div class="clock" id="clock">00:00</div>
+  <div class="total-left" id="total-left"></div>
+  <div class="controls">
+    <button class="ctrl-btn" id="pause-resume-btn" onclick="togglePause()">PAUSE</button>
+    <button class="ctrl-btn primary" id="next-btn" onclick="nextStep()">SKIP →</button>
+  </div>
+  <div class="queue-title" id="queue-title">Up Next</div>
+  <div class="queue" id="queue"></div>
+  <button class="edit-link" onclick="backToEditor()" id="btn-edit">← Edit session</button>
+</div>
+
+<!-- ── DONE ── -->
+<div id="done-view">
+  <div class="done-big" id="done-title">Session Complete</div>
+  <div class="done-sub" id="done-stats"></div>
+  <button class="start-btn" onclick="backToEditor()" id="btn-new-session">NEW SESSION</button>
+</div>
+
+<script>
+
+  // Language Translations
+  const lang = {
+    en: {
+      subtitle:         'Work - Relax - Repeat',
+      notifText:        'Enable notifications for this website for Alarm',
+      notifBtn:         'Enable',
+      notifPwa:         'Install this page as PWA for easier & offline use.',
+      headerType:       'Type',
+      totalTime:        'Time',
+      btnAddTask:       '+ Task',
+      btnAddPause:      '+ Pause',
+      btnStart:         'START',
+      stepLabel:        'Step',
+      stepOf:           'of',
+      badgeTask:        'TASK',
+      badgeBreak:       'BREAK',
+      btnPause:         'PAUSE',
+      btnResume:        'RESUME',
+      btnSkip:          'SKIP →',
+      btnFinish:        'FINISH',
+      queueTitle:       'Up Next',
+      btnEdit:          '← Edit session',
+      doneTitle:        'Session Complete',
+      btnNewSession:    'NEW SESSION',
+      remainingSession: 'remaining in session',
+      taskLabel:        'TASK',
+      pauseLabel:       'PAUSE',
+      taskPlaceholder:  'Task name…',
+      pausePlaceholder: 'Pause',
+      notifUpNext:      'Up next',
+      notifDone:        'Session complete!',
+      notifFinishTitle: '✔ Session Complete!',
+      notifFinishBody:  'tasks finished. Great work!',
+      taskWord:         'task',
+      tasksWord:        'tasks',
+      breakWord:        'break',
+      breaksWord:       'breaks',
+      completedWord:    'completed',
+      minLabel:         'min',
+      createdBy:        'Created by Mil Stamenković',
+      appNameTitle:     '<span style="color:red">Mil</span> <span style="color:red">Wo</span>rk <span style="color:red">T</span>imer',
+      headerName:       'Task name',
+    },
+    sr: {
+      subtitle:         'Рад - Одмор - Поново',       
+      notifText:        'Одобрите нотификације за овај вебсајт за аларм.',      
+      notifBtn:         'Одобри',                       
+      notifPwa:         'Инсталирајте ову страницу као "PWA" за лакшу и офлајн употребу.', 
+      headerType:       'Тип',                        
+      totalTime:        'Време',                   
+      btnAddTask:       '+ Рад',                       
+      btnAddPause:      '+ Пауза',                      
+      btnStart:         'ПОЧНИ',                        
+      stepLabel:        'SR: Step',                         
+      stepOf:           'SR: of',                           
+      badgeTask:        'SR: Задатак',                         
+      badgeBreak:       'SR: BREAK',                        
+      btnPause:         'SR: PAUSE',                        
+      btnResume:        'SR: RESUME',                       
+      btnSkip:          'SR: SKIP →',                       
+      btnFinish:        'SR: FINISH',                       
+      queueTitle:       'SR: Up Next',                      
+      btnEdit:          'SR: ← Edit session',               
+      doneTitle:        'SR: Session Complete',             
+      btnNewSession:    'SR: NEW SESSION',                  
+      remainingSession: 'SR: remaining in session',         
+      taskLabel:        'РАД',                         
+      pauseLabel:       'ПАУЗА',                        
+      taskPlaceholder:  'Рад',                   
+      pausePlaceholder: 'Пауза',                        
+      notifUpNext:      'SR: Up next',                      
+      notifDone:        'SR: Session complete!',            
+      notifFinishTitle: 'SR: ✔ Session Complete!',         
+      notifFinishBody:  'SR: tasks finished. Great work!',  
+      taskWord:         'Рад',                         
+      tasksWord:        'Рад',                        
+      breakWord:        'SR: break',                        
+      breaksWord:       'SR: breaks',                       
+      completedWord:    'SR: completed',   
+      minLabel:         'мин',   
+      createdBy:        'Направио Милан Стаменковић',
+      appNameTitle:     'Миланов радни тајмер',   
+      headerName:       'Име задатка',         
+    }
+  };
+
+  let currentLang = 'en';
+
+  function toggleLang() {
+    currentLang = currentLang === 'en' ? 'sr' : 'en';
+    document.getElementById('lang-btn').textContent = currentLang === 'en' ? 'SR' : 'EN';
+    applyLang();
+  }
+
+  function applyLang() {
+    const l = lang[currentLang];
+    document.getElementById('subtitle').textContent         = l.subtitle;
+    document.getElementById('notif-text').textContent       = l.notifText;
+    document.getElementById('notif-btn').textContent        = l.notifBtn;
+    document.getElementById('notif-pwa').textContent        = l.notifPwa;
+    document.getElementById('header-type').textContent      = l.headerType;
+    document.getElementById('btn-add-task').textContent     = l.btnAddTask;
+    document.getElementById('btn-add-pause').textContent    = l.btnAddPause;
+    document.getElementById('btn-start').textContent        = l.btnStart;
+    document.getElementById('queue-title').textContent      = l.queueTitle;
+    document.getElementById('btn-edit').textContent         = l.btnEdit;
+    document.getElementById('done-title').textContent       = l.doneTitle;
+    document.getElementById('btn-new-session').textContent  = l.btnNewSession;
+    document.getElementById('createdBy').textContent        = l.createdBy;
+    document.getElementById('appNameTitle').innerHTML       = l.appNameTitle;
+    document.getElementById('header-name').textContent      = l.headerName;
+    document.documentElement.style.setProperty('--min-label', `'${l.minLabel}'`);
+    // Update placeholders in existing task rows without rebuilding
+    document.querySelectorAll('.task-row').forEach((row, i) => {
+      const input = row.querySelector('input[type="text"]');
+      if (input) {
+        const isPause = tasks[i] && tasks[i].type === 'pause';
+        input.placeholder = isPause ? l.pausePlaceholder : l.taskPlaceholder;
+      }
+      const toggle = row.querySelector('.type-toggle');
+      if (toggle && tasks[i]) {
+        toggle.textContent = tasks[i].type === 'pause' ? l.pauseLabel : l.taskLabel;
+      }
+    });
+    updateTotalLabel();
+  }
+  // ── Burger Menu ──
+  const menuText = {
+    en: {
+      langLabel:        'Притисните за српски',
+      themeLabelDark:   'Toggle for Dark theme',
+      themeLabelLight:  'Toggle for Light theme',
+      readmeLabel:      'Read Me',
+      copyrightLabel:   'Copyright',
+      placeholderLabel: 'Coming soon...',
+      subpanelBack:     '← Back',
+      readmeTitle:      'Read Me',
+      readmeBody:       '"MilWoT" is a simple work timer.\n\nAdd tasks and pauses, set their durations, then hit START. The timer runs through your session automatically and alerts you when each step ends.\n\nTip: Drag the ▲▼ handle to reorder tasks.\nClick TASK/PAUSE to toggle the type.',
+      copyrightTitle:   'Copyright',
+      copyrightBody:    '© 2026 Mil Stamenković\nĆuprija, Serbia\n\nCreated with help of Claude AI.\nAll rights reserved.',
+    },
+    sr: {
+      langLabel:        'Toggle for English',
+      themeLabelDark:   'Притисните за светлу тему',
+      themeLabelLight:  'Притисните за тамну тему',      
+      readmeLabel:      'Упутство',            
+      copyrightLabel:   'Ауторска права',      
+      placeholderLabel: 'Ускоро...',             
+      backLabel:        '← Назад',             
+      subpanelBack:     '← Назад',
+      readmeTitle:      'Упутство',
+      readmeBody:       '"MilWoT" је једноставан тајмер за рад.\n\nДодајте задатке и паузе, подесите њихова трајања, затим кликните СТАРТ. Тајмер иде кроз сесију аутоматски и обавештава Вас када се сваки корак заврши.\n\nСавет: Користит ▲▼ ручице да промените редослед.\nКликните на ЗАДАТАК/ПАУЗА да промените тип.',
+      copyrightTitle:   'Ауторска права',
+      copyrightBody:    '© 2026 Милан Стаменковић\nЋуприја, Србија\n\nНаправљено уз помоћ бесплатног "Claude AI".\nСва права задржана.',
+    }
+  };
+
+  function openMenu() {
+    showMenuMain();
+    // Sync toggles with current state
+    document.getElementById('lang-toggle').checked = currentLang === 'sr';
+    document.getElementById('theme-toggle').checked = document.body.classList.contains('light');
+    applyMenuText();
+    document.getElementById('menu-overlay').classList.add('open');
+  }
+
+  function closeMenu() {
+    document.getElementById('menu-overlay').classList.remove('open');
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('menu-overlay')) closeMenu();
+  }
+
+  function showSubpanel(type) {
+    const m = menuText[currentLang];
+    document.getElementById('menu-main').classList.add('hidden');
+    document.getElementById('menu-subpanel').classList.add('open');
+    if (type === 'readme') {
+      document.getElementById('subpanel-title').textContent = m.readmeTitle;
+      document.getElementById('subpanel-body').innerHTML = m.readmeBody.replace(/\n/g, '<br>');
+    } else {
+      document.getElementById('subpanel-title').textContent = m.copyrightTitle;
+      document.getElementById('subpanel-body').innerHTML = m.copyrightBody.replace(/\n/g, '<br>');
+    }
+  }
+
+  function showMenuMain() {
+    document.getElementById('menu-main').classList.remove('hidden');
+    document.getElementById('menu-subpanel').classList.remove('open');
+  }
+
+  function applyMenuText() {
+    const m = menuText[currentLang];
+    document.getElementById('menu-lang-label').textContent      = m.langLabel;
+    const isLight = document.body.classList.contains('light'); document.getElementById('menu-theme-label').textContent = isLight ? m.themeLabelDark : m.themeLabelLight;
+    document.getElementById('menu-readme-label').textContent    = m.readmeLabel;
+    document.getElementById('menu-copyright-label').textContent = m.copyrightLabel;
+    document.getElementById('menu-placeholder-label').textContent = m.placeholderLabel;
+    document.getElementById('subpanel-back').textContent = m.subpanelBack;
+    document.getElementById('menu-theme-icon').textContent = isLight ? '🌙' : '☀️';
+  }
+
+  function menuToggleLang() {
+    currentLang = document.getElementById('lang-toggle').checked ? 'sr' : 'en';
+    applyLang();
+    applyMenuText();
+  }
+
+  function toggleTheme() {
+  const isLight = document.getElementById('theme-toggle').checked;
+  document.body.classList.toggle('light', isLight);
+  document.getElementById('menu-theme-icon').textContent  = isLight ? '🌙' : '☀️';
+  document.getElementById('menu-theme-label').textContent = isLight ? menuText[currentLang].themeLabelDark : menuText[currentLang].themeLabelLight;
+  }
+
+  // ── State ──
+  let tasks = [];
+  let currentStep = 0;
+  let secondsLeft = 0;
+  let totalSecondsLeft = 0;
+  let timerInterval = null;
+  let isPaused = false;
+  let stepDuration = 0;
+  let stepElapsed = 0;
+
+  // ── Notifications ──
+  function checkNotifBanner() {
+    if (!('Notification' in window)) return;
+    const banner = document.getElementById('notif-banner');
+    if (Notification.permission === 'default') {
+      banner.style.display = 'flex';
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
+  function requestNotifPermission() {
+    Notification.requestPermission().then(() => {
+      document.getElementById('notif-banner').classList.add('hidden');
+    });
+  }
+
+  function sendNotification(title, body) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    try {
+      const n = new Notification(title, {
+        body,
+        icon: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/23f1.svg',
+        silent: false
+      });
+      setTimeout(() => n.close(), 8000);
+    } catch(e) {}
+  }
+
+  // ── Audio ──
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  function beep(freq = 880, dur = 0.15, vol = 0.4, type = 'sine') {
+    try {
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = type;
+      gain.gain.setValueAtTime(vol, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.start(); osc.stop(ctx.currentTime + dur);
+    } catch(e) {}
+  }
+
+  function alertSound() {
+    beep(660, 0.12);
+    setTimeout(() => beep(880, 0.12), 140);
+    setTimeout(() => beep(1100, 0.2), 280);
+  }
+
+  function flash(color = 'rgba(232,197,71,0.18)') {
+    const el = document.getElementById('flash');
+    el.style.background = color;
+    el.classList.add('active');
+    setTimeout(() => el.classList.remove('active'), 300);
+  }
+
+  // ── Editor ──
+  function addTask(name = '', minutes = 25) {
+    tasks.push({ name, minutes, type: 'task' });
+    renderEditor();
+  }
+
+  function addPause(name = '', minutes = 5) {
+    tasks.push({ name, minutes, type: 'pause' });
+    renderEditor();
+  }
+
+  function removeTask(i) {
+    tasks.splice(i, 1);
+    renderEditor();
+  }
+
+  function toggleType(i) {
+    tasks[i].type = tasks[i].type === 'task' ? 'pause' : 'task';
+    renderEditor();
+  }
+
+  function renderEditor() {
+    const l = lang[currentLang];
+    const list = document.getElementById('task-list');
+    list.innerHTML = '';
+    tasks.forEach((t, i) => {
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      row.innerHTML = `
+        <button class="type-toggle ${t.type === 'pause' ? 'is-pause' : ''}" onclick="toggleType(${i})">
+          ${t.type === 'pause' ? l.pauseLabel : l.taskLabel}
+        </button>
+        <div class="drag-handle">
+          <span>▲</span>
+          <span>▼</span>
+        </div>
+        <input type="text" placeholder="${t.type === 'pause' ? l.pausePlaceholder : l.taskPlaceholder}"
+               value="${escHtml(t.name)}"
+               class="${t.type === 'pause' ? 'pause-name' : ''}"
+               oninput="tasks[${i}].name=this.value" />
+        <div class="minutes-wrap">
+          <input type="number" max="999" value="${t.minutes}"
+                 oninput="tasks[${i}].minutes=parseInt(this.value)||0;updateTotalLabel()" />
+        </div>
+        <button class="remove" onclick="removeTask(${i})">×</button>
+      `;
+      list.appendChild(row);
+    });
+    updateTotalLabel();
+  }
+
+  function escHtml(s) {
+    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function updateTotalLabel() {
+    const l = lang[currentLang];
+    const total = tasks.reduce((s, t) => s + (parseInt(t.minutes) || 0), 0);
+    const h = Math.floor(total / 60), m = total % 60;
+    const value = h > 0 ? `${h}h ${m}m` : `${m}m`;
+    document.getElementById('total-time-label').innerHTML =
+      `${l.totalTime} <span style="text-transform:none">${value}</span>`;
+  }
+
+  // ── Session ──
+  function startSession() {
+    const l = lang[currentLang];
+    const valid = tasks.filter(t => t.minutes > 0);
+    if (valid.length === 0) return;
+    tasks.forEach((t, i) => {
+      if (!t.name.trim()) t.name = t.type === 'pause' ? l.pausePlaceholder : `${l.taskLabel} ${i+1}`;
+    });
+
+    currentStep = 0;
+    totalSecondsLeft = tasks.reduce((s, t) => s + t.minutes * 60, 0);
+
+    document.getElementById('editor').style.display = 'none';
+    document.getElementById('done-view').style.display = 'none';
+    document.getElementById('timer-view').style.display = 'flex';
+
+    document.getElementById('step-total').textContent = tasks.length;
+    renderQueue();
+    startStep();
+  }
+
+  function startStep() {
+    const l = lang[currentLang];
+    const t = tasks[currentStep];
+    stepDuration = t.minutes * 60;
+    secondsLeft = stepDuration;
+    stepElapsed = 0;
+    isPaused = false;
+
+    const isPauseStep = t.type === 'pause';
+    const nameEl = document.getElementById('current-name');
+    nameEl.textContent = t.name;
+    nameEl.classList.toggle('is-pause', isPauseStep);
+
+    document.getElementById('type-badge').textContent = isPauseStep ? l.badgeBreak : l.badgeTask;
+    document.getElementById('step-num').textContent = currentStep + 1;
+
+    // Update step label text
+    document.getElementById('step-label-text').innerHTML =
+      `${l.stepLabel} <span id="step-num">${currentStep + 1}</span> ${l.stepOf} <span id="step-total">${tasks.length}</span>`;
+
+    const fill = document.getElementById('progress-fill');
+    fill.classList.toggle('is-pause', isPauseStep);
+    fill.style.width = '0%';
+
+    const btn = document.getElementById('pause-resume-btn');
+    btn.textContent = l.btnPause;
+    btn.style.borderColor = 'green';
+    btn.style.color = 'green';
+
+    document.getElementById('next-btn').textContent =
+      currentStep < tasks.length - 1 ? l.btnSkip : l.btnFinish;
+
+    updateClock();
+    renderQueue();
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(tick, 1000);
+  }
+
+  function tick() {
+    if (isPaused) return;
+    secondsLeft--;
+    totalSecondsLeft--;
+    stepElapsed++;
+
+    updateClock();
+
+    const pct = (stepElapsed / stepDuration) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+
+    if (secondsLeft <= 0) {
+      clearInterval(timerInterval);
+      alertSound();
+      flash(tasks[currentStep].type === 'pause' ? 'rgba(107,197,168,0.2)' : 'rgba(232,197,71,0.2)');
+
+      const l = lang[currentLang];
+      const finishedName = tasks[currentStep].name;
+      const nextTask = tasks[currentStep + 1];
+      const notifBody = nextTask
+        ? `${l.notifUpNext}: ${nextTask.name} (${nextTask.minutes} min)`
+        : l.notifDone;
+      sendNotification(`⏱ ${finishedName}`, notifBody);
+
+      setTimeout(() => {
+        if (currentStep < tasks.length - 1) {
+          currentStep++;
+          totalSecondsLeft = tasks.slice(currentStep).reduce((s, t) => s + t.minutes * 60, 0);
+          startStep();
+        } else {
+          finishSession();
+        }
+      }, 800);
+    }
+  }
+
+  function updateClock() {
+    const l = lang[currentLang];
+    const m = Math.floor(secondsLeft / 60);
+    const s = secondsLeft % 60;
+    const clock = document.getElementById('clock');
+    clock.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    clock.classList.toggle('warning', secondsLeft <= 60 && secondsLeft > 0 && tasks[currentStep].type !== 'pause');
+    clock.classList.toggle('is-pause', tasks[currentStep].type === 'pause');
+
+    const tr = totalSecondsLeft;
+    const th = Math.floor(tr / 3600);
+    const tm = Math.floor((tr % 3600) / 60);
+    const ts = tr % 60;
+    const totalStr = th > 0
+      ? `${th}h ${tm}m ${l.remainingSession}`
+      : `${tm}m ${String(ts).padStart(2,'0')}s ${l.remainingSession}`;
+    document.getElementById('total-left').textContent = totalStr;
+  }
+
+  function togglePause() {
+    const l = lang[currentLang];
+    isPaused = !isPaused;
+    const btn = document.getElementById('pause-resume-btn');
+    btn.textContent       = isPaused ? l.btnResume : l.btnPause;
+    btn.style.borderColor = isPaused ? 'red' : 'green';
+    btn.style.color       = isPaused ? 'red' : 'green';
+    beep(isPaused ? 440 : 660, 0.08);
+  }
+
+  function nextStep() {
+    clearInterval(timerInterval);
+    if (currentStep < tasks.length - 1) {
+      totalSecondsLeft -= secondsLeft;
+      currentStep++;
+      startStep();
+    } else {
+      finishSession();
+    }
+  }
+
+  function finishSession() {
+    const l = lang[currentLang];
+    clearInterval(timerInterval);
+    document.getElementById('timer-view').style.display = 'none';
+    document.getElementById('done-view').style.display = 'flex';
+    const taskCount  = tasks.filter(t => t.type === 'task').length;
+    const pauseCount = tasks.filter(t => t.type === 'pause').length;
+    document.getElementById('done-stats').textContent =
+      `${taskCount} ${taskCount !== 1 ? l.tasksWord : l.taskWord} · ${pauseCount} ${pauseCount !== 1 ? l.breaksWord : l.breakWord} ${l.completedWord}`;
+    sendNotification(l.notifFinishTitle, `${taskCount} ${l.notifFinishBody}`);
+    alertSound(); setTimeout(alertSound, 500);
+  }
+
+  function backToEditor() {
+    clearInterval(timerInterval);
+    document.getElementById('timer-view').style.display = 'none';
+    document.getElementById('done-view').style.display = 'none';
+    document.getElementById('editor').style.display = 'block';
+    renderEditor();
+  }
+
+  function renderQueue() {
+    const q = document.getElementById('queue');
+    q.innerHTML = '';
+    tasks.forEach((t, i) => {
+      const item = document.createElement('div');
+      item.className = 'queue-item' +
+        (i === currentStep ? ' current' + (t.type === 'pause' ? ' is-pause' : '') : '') +
+        (i < currentStep ? ' done' : '');
+      item.innerHTML = `
+        <span class="queue-item-name">${escHtml(t.name)}</span>
+        <span class="queue-item-dur">${t.minutes}min</span>
+      `;
+      q.appendChild(item);
+    });
+  }
+
+  // ── Init ──
+  tasks = [
+    { name: '...', minutes: 0, type: 'task' },
+    { name: '...',  minutes: 0,  type: 'pause' },
+    { name: '...', minutes: 0, type: 'task' },
+    { name: '...', minutes: 0, type: 'task' },
+    { name: '...',  minutes: 0,  type: 'pause' },
+  ];
+  renderEditor();
+  checkNotifBanner();
+
+  Sortable.create(document.getElementById('task-list'), {
+    handle: '.drag-handle',
+    animation: 150,
+    onEnd: function(evt) {
+      const moved = tasks.splice(evt.oldIndex, 1)[0];
+      tasks.splice(evt.newIndex, 0, moved);
+    }
+  });
+
+</script>
+</body>
+</html>
