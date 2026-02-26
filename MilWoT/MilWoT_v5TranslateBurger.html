@@ -21,6 +21,9 @@
 <!-- 10) ... -->
 <!--  *) Finish it as fully-offline-any-device-PWA -->
 
+<!-- FIX problem with NOTIFICATIONS. -->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -767,6 +770,24 @@
 
 <div id="flash"></div>
 
+<h1 style="text-decoration: underline; text-underline-offset: 0.3em">MilWoT</h1>
+<p id="appNameTitle"><span style="color:red">Mil</span> <span style="color:red">Wo</span>rk <span style="color:red">T</span>imer</p>
+<p id="createdBy" style="font-size: 0.75em; font-style: italic;">Created by Mil Stamenković</p>
+<br>
+<div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:30px;">
+  <p class="subtitle" id="subtitle" style="margin-bottom:0; line-height:1">Work - Relax - Repeat</p>
+  <button id="burger-btn" onclick="openMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<!-- Notification permission banner -->
+<div id="notif-banner">
+  <span style="text-align: center;" id="notif-text">Enable notifications for this website for Alarm</span>
+  <button onclick="requestNotifPermission()" id="notif-btn">Enable</button>
+  <p style="font-style: italic; text-align: center;" id="notif-pwa">Install this page as PWA for easier & offline use.</p>
+</div>
+
 <!-- ── BURGER MENU OVERLAY ── -->
 <div id="menu-overlay" onclick="handleOverlayClick(event)">
   <div id="menu-panel">
@@ -811,24 +832,6 @@
       <div class="subpanel-body" id="subpanel-body"></div>
     </div>
   </div>
-</div>
-
-<h1 style="text-decoration: underline; text-underline-offset: 0.3em">MilWoT</h1>
-<p id="appNameTitle"><span style="color:red">Mil</span> <span style="color:red">Wo</span>rk <span style="color:red">T</span>imer</p>
-<p id="createdBy" style="font-size: 0.75em; font-style: italic;">Created by Mil Stamenković</p>
-<br>
-<div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:30px;">
-  <p class="subtitle" id="subtitle" style="margin-bottom:0; line-height:1">Work - Relax - Repeat</p>
-  <button id="burger-btn" onclick="openMenu()">
-    <span></span><span></span><span></span>
-  </button>
-</div>
-
-<!-- Notification permission banner -->
-<div id="notif-banner">
-  <span style="text-align: center;" id="notif-text">Enable notifications for this website for Alarm</span>
-  <button onclick="requestNotifPermission()" id="notif-btn">Enable</button>
-  <p style="font-style: italic; text-align: center;" id="notif-pwa">Install this page as PWA for easier & offline use.</p>
 </div>
 
 <!-- ── EDITOR ── -->
