@@ -4,7 +4,7 @@
 <!-- Version F -->
 <!-- Created with help of Free Claude AI -->
 <!-- Created: 27.02.2026. - Ćuprija, Serbia -->
-<!-- Revised: 27.02.2026. - Ćuprija, Serbia -->
+<!-- Revised: 28.02.2026. - Ćuprija, Serbia -->
 
 <!--    TO DO    -->
 <!--  ✔) OFFLINE mode if possible -->
@@ -13,18 +13,17 @@
 <!--  ✔) OPTIONS: Auto-language: Serbian Latin; English -->
 <!--  ✔) BURGER MENU: Language; Light/Dark theme  -->
 <!--  ✔) POP-UP menu for LANG, COPYRIGHT, COLOR, etc. -->
+<!--  ✔) Add EXPLANATION Page & Copyright page -->
 <!--  ✔) TIMER SCREEN: Shorter, not taking so much height on screen -->
-<!--  x) FIX the Burger menu not working! -->
-<!--  7) TIMER SCREEN: Reset button -->
-<!--  8) Add EXPLANATION Page & Copyright page -->
+
+<!--  -) FIX problem with NOTIFICATIONS! -->
+
 <!--  9) Creat LOGO and ICONS with LOGO -->
-<!-- 10) TRANSLATE 100% all -->
-<!-- 10) TRANSLATE 100% all -->
-<!-- 12) Finish it as fully-offline-any-device-PWA -->
-<!-- 13) ... -->
+<!-- 10) Finish TRANSLATE all -->
+<!-- 11) Finish it as fully-offline-any-device-PWA -->
+<!-- 12) ... -->
 <!--  *) FUTURE - Ambient sounds. Rain, hum, keyboards typing, etc. -->
 
-<!-- FIX problem with NOTIFICATIONS. -->
 
 
 <!DOCTYPE html>
@@ -218,7 +217,7 @@
     border-color: var(--accent);
   }
 
-  .task-row button.emove {
+  .task-row button.remove {
     width: 28px;
     flex-shrink: 0;
     background: none;
@@ -233,7 +232,7 @@
     transition: color 0.2s;
   }
 
-  .task-row button.emove:hover { color: var(--danger); }
+  .task-row button.remove:hover { color: var(--danger); }
 
   .editor-actions {
     display: flex;
@@ -918,7 +917,7 @@
       btnEdit:          '← Edit session',
       doneTitle:        'Session Complete',
       btnNewSession:    'NEW SESSION',
-      emainingSession: 'emaining in session',
+      remainingSession: 'remaining in session',
       taskLabel:        'TASK',
       pauseLabel:       'PAUSE',
       taskPlaceholder:  'Task name…',
@@ -959,7 +958,7 @@
       btnEdit:          'SR: ← Edit session',               
       doneTitle:        'SR: Session Complete',             
       btnNewSession:    'SR: NEW SESSION',                  
-      emainingSession: 'SR: emaining in session',         
+      remainingSession: 'SR: remaining in session',         
       taskLabel:        'РАД',                         
       pauseLabel:       'ПАУЗА',                        
       taskPlaceholder:  'Рад',                   
@@ -1061,7 +1060,7 @@
   }
 
   function closeMenu() {
-    document.getElementById('menu-overlay').classList.emove('open');
+    document.getElementById('menu-overlay').classList.remove('open');
   }
 
   function handleOverlayClick(e) {
@@ -1082,8 +1081,8 @@
   }
 
   function showMenuMain() {
-    document.getElementById('menu-main').classList.emove('hidden');
-    document.getElementById('menu-subpanel').classList.emove('open');
+    document.getElementById('menu-main').classList.remove('hidden');
+    document.getElementById('menu-subpanel').classList.remove('open');
   }
 
   function applyMenuText() {
@@ -1175,7 +1174,7 @@
     const el = document.getElementById('flash');
     el.style.background = color;
     el.classList.add('active');
-    setTimeout(() => el.classList.emove('active'), 300);
+    setTimeout(() => el.classList.remove('active'), 300);
   }
 
   // ── Editor ──
@@ -1222,7 +1221,7 @@
           <input type="number" max="999" value="${t.minutes}"
                  oninput="tasks[${i}].minutes=parseInt(this.value)||0;updateTotalLabel()" />
         </div>
-        <button class="emove" onclick="emoveTask(${i})">×</button>
+        <button class="remove" onclick="removeTask(${i})">×</button>
       `;
       list.appendChild(row);
     });
@@ -1290,8 +1289,8 @@
 
     const btn = document.getElementById('pause-resume-btn');
     btn.textContent = l.btnPause;
-    btn.style.borderColor = 'green';
-    btn.style.color = 'green';
+    btn.style.borderColor = 'red';
+    btn.style.color = 'red';
 
     document.getElementById('skip-btn').textContent =
       currentStep < tasks.length - 1 ? l.btnSkip : l.btnFinish;
@@ -1353,8 +1352,8 @@
     const tm = Math.floor((tr % 3600) / 60);
     const ts = tr % 60;
     const totalStr = th > 0
-      ? `${th}h ${tm}m ${l.emainingSession}`
-      : `${tm}m ${String(ts).padStart(2,'0')}s ${l.emainingSession}`;
+      ? `${th}h ${tm}m ${l.remainingSession}`
+      : `${tm}m ${String(ts).padStart(2,'0')}s ${l.remainingSession}`;
     document.getElementById('total-left').textContent = totalStr;
   }
 
