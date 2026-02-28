@@ -1,0 +1,948 @@
+<!-- MilWoT - Mil Work Timer -->
+<!-- Simple workt timer with continues timers for tasks and pauses by Mil Stamenković -->
+<!-- © 2026 Mil Stamenković -->
+<!-- Version D -->
+<!-- Created with help of Claude AI -->
+<!-- Created: 25.02.2026. - Ćuprija, Serbia -->
+<!-- Revised: 26.02.2026. - Ćuprija, Serbia -->
+
+<!--    TO DO    -->
+<!--  ✔) OFFLINE mode if possible -->
+<!--  ✔) MAIN SCREEN: Entering time stays inside input field -->
+<!--  ✔) MAIN SCREEN: Drag to reorder tasks --> 
+<!--  ?) OPTIONS: Auto-language: Serbian Latin; Serbian Cyrilic; English -->
+<!--  -) BURGER MENU: Language; Light/Dark theme  -->
+<!--  6) TIMER SCREEN: Shorter, not taking so much height on screen -->
+<!--  7) TIMER SCREEN: Reset button -->
+<!--  8) Add EXPLANATION Page & Copyright page -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MilWoT</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<style>
+  :root {
+    /* Original color scheme with CSS variables for easy tweaking */
+    /*--bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --border: #2a2a2a;
+    --accent: #e8c547;
+    --pause-accent: #6bc5a8;
+    --text: #f0ede6;
+    --muted: #666;
+    --danger: #e05252;*/
+
+    /* Mil color scheme */
+    --bg: #000000;
+    --surface: #1d1d1d;
+    --border: #2a2a2a;
+    --accent: #960000;
+    --pause-accent: #960000;
+    --text: #afafaf;
+    --muted: #595959;
+    --danger: #646464;
+  }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: fit-content;
+    min-width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    position: relative;
+    overflow-x: hidden;
+    top: 0 !important;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(232,197,71,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(107,197,168,0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2em;
+    letter-spacing: 0.5em;
+    font-weight: 1000;
+    margin-bottom: 0.5em;
+    color: #ff0000;
+  }
+
+  .subtitle {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+  }
+
+  /* ── EDITOR ── */
+  #editor {
+    width: 100%;
+    max-width: 540px;
+  }
+
+  .editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .editor-header span {
+    font-size: 0.65em;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 10px;
+  }
+
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Fixed-width type toggle so all rows align */
+  .type-toggle {
+    width: 58px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65em;
+    padding: 5px 0;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .type-toggle.is-pause {
+    color: var(--pause-accent);
+  }
+
+  .task-row input[type="text"] {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65em;
+    padding: 5px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .task-row input[type="text"]:focus {
+    border-color: var(--accent);
+  }
+
+  .task-row input[type="text"].pause-name {
+    color: var(--pause-accent);
+  }
+
+  .task-row input[type="number"] {
+    width: 72px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 5px 10px;
+    outline: none;
+    text-align: center;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+
+  .task-row input[type="number"]::-webkit-outer-spin-button,
+  .task-row input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .task-row input[type="number"]:focus {
+    border-color: var(--accent);
+  }
+
+  .task-row button.remove {
+    width: 28px;
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 4px 0;
+    border-radius: 4px;
+    text-align: center;
+    transition: color 0.2s;
+  }
+
+  .task-row button.remove:hover { color: var(--danger); }
+
+  .editor-actions {
+    display: flex;
+    height: 30px;
+    gap: 8px;
+  }
+
+  button.add-task {
+    flex: 1;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  button.add-task:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  button.start-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    color: #0f0f0f;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 10px 28px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: opacity 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  button.start-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  button.start-btn:active { transform: translateY(0); }
+
+  /* Notification permission banner */
+  #notif-banner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 240px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 6px;
+    margin-bottom: 10px;
+    font-size: 0.5rem;
+    color: var(--muted);
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+  }
+
+  #notif-banner button {
+    background: green;
+    border: none;
+    border-radius: 5px;
+    color: #0f0f0f;
+    font-family: 'DM Mono', monospace;
+    font-size: 1em;
+    letter-spacing: 1px;
+    padding: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  #notif-banner.hidden { display: none !important; }
+
+  /* ── TIMER VIEW ── */
+  #timer-view {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .progress-bar-wrap {
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 40px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 1s linear, background 0.5s;
+    width: 0%;
+  }
+
+  .progress-bar-fill.is-pause {
+    background: var(--pause-accent);
+  }
+
+  .step-label {
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .step-label span {
+    color: var(--accent);
+  }
+
+  .current-task-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    text-align: center;
+    margin-bottom: 8px;
+    line-height: 1.2;
+    transition: color 0.4s;
+  }
+
+  .current-task-name.is-pause {
+    color: var(--pause-accent);
+  }
+
+  .type-badge {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  .clock {
+    font-size: 5.5rem;
+    font-weight: 500;
+    letter-spacing: -4px;
+    line-height: 1;
+    margin-bottom: 12px;
+    transition: color 0.3s;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .clock.warning { color: var(--danger); }
+  .clock.is-pause { color: var(--pause-accent); }
+
+  .total-left {
+    font-size: 0.5em;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 48px;
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .ctrl-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .ctrl-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0f0f0f;
+  }
+
+  .ctrl-btn.primary:hover {
+    opacity: 0.85;
+    color: #0f0f0f;
+  }
+
+  /* Queue */
+  .queue-title {
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    align-self: flex-start;
+  }
+
+  .queue {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .queue-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 0.8rem;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+  }
+
+  .queue-item.current {
+    opacity: 1;
+    border-color: var(--accent);
+  }
+
+  .queue-item.current.is-pause {
+    border-color: var(--pause-accent);
+  }
+
+  .queue-item.done {
+    opacity: 0.2;
+    text-decoration: line-through;
+  }
+
+  .queue-item-name { flex: 1; }
+
+  .queue-item-dur {
+    color: var(--muted);
+    font-size: 0.7rem;
+  }
+
+  /* Flash overlay */
+  #flash {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 100;
+  }
+
+  #flash.active { opacity: 1; }
+
+  .edit-link {
+    margin-top: 32px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .edit-link:hover { color: var(--text); }
+
+  /* Done screen */
+  #done-view {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .done-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    margin-bottom: 12px;
+    color: var(--accent);
+  }
+
+  .done-sub {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-bottom: 32px;
+  }
+
+  .minutes-wrap {
+  position: relative;
+  width: 72px;
+  flex-shrink: 0;
+}
+
+  .minutes-wrap input {
+    width: 100%;
+    padding-right: 26px;
+    text-align: left;
+  }
+
+  .minutes-wrap::after {
+    content: 'min';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 0.5em;
+    pointer-events: none;
+  }
+
+  .drag-handle {
+    width: 16px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    color: var(--muted);
+    font-size: 0.5em;
+    cursor: grab;
+    user-select: none;
+    line-height: 1;
+  }
+
+  .drag-handle:active { cursor: grabbing; }
+
+  .goog-te-banner-frame {
+    display: none !important;
+  }
+  #google_translate_element {
+    display: none;
+  }
+
+</style>
+</head>
+<body>
+
+<div id="flash"></div>
+
+<h1 style="text-decoration: underline; text-underline-offset: 0.3em">MilWoT</h1>
+<p>Mil Work Timer</p>
+<p style="font-size: 0.75em; font-style: italic;">Created by Mil Stamenković</p>
+<br>
+<p class="subtitle">Work - Relax - Repeat</p>
+
+<!-- Notification permission banner -->
+<div id="notif-banner"
+  <span>Enable notifications for this website for Alarm</span>
+  <button onclick="requestNotifPermission()">Enable</button>
+  <p style="font-style: italic;">Install this page as PWA for easier & offline use.</p>
+</div>
+
+<!-- ── EDITOR ── -->
+<div id="editor">
+  <div class="editor-header">
+    <span style="padding-left: 2.5%;">Type</span>
+    <span id="total-time-label"></span>
+  </div>
+  <div class="task-list" id="task-list"></div>
+  <div style="display:flex; gap:5px;">
+    <div style="width:58px; flex-shrink:0;"></div>
+    <div style="width:12px; flex-shrink:0;"></div>
+    <div class="editor-actions" style="flex:1;">
+      <button class="add-task" onclick="addTask()" style="flex:1">+ Task</button>
+      <button class="add-task" onclick="addPause()" style="flex:1">+ Pause</button>
+      <button class="start-btn" onclick="startSession()" style="flex:2">START</button>
+    </div>
+    <div style="width:72px; flex-shrink:0;"></div>
+    <div style="width:28px; flex-shrink:0;"></div>
+  </div>
+</div>
+
+<!-- ── TIMER ── -->
+<div id="timer-view">
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill"></div>
+  </div>
+  <div class="step-label">Step <span id="step-num">1</span> of <span id="step-total">1</span></div>
+  <div class="current-task-name" id="current-name">Task</div>
+  <div class="type-badge" id="type-badge">TASK</div>
+  <div class="clock" id="clock">00:00</div>
+  <div class="total-left" id="total-left"></div>
+  <div class="controls">
+    <button class="ctrl-btn" id="pause-resume-btn" onclick="togglePause()">PAUSE</button>
+    <button class="ctrl-btn primary" id="next-btn" onclick="nextStep()">SKIP →</button>
+  </div>
+  <div class="queue-title">Up Next</div>
+  <div class="queue" id="queue"></div>
+  <button class="edit-link" onclick="backToEditor()">← Edit session</button>
+</div>
+
+<!-- ── DONE ── -->
+<div id="done-view">
+  <div class="done-big">Session Complete</div>
+  <div class="done-sub" id="done-stats"></div>
+  <button class="start-btn" onclick="backToEditor()">NEW SESSION</button>
+</div>
+
+<script>
+  
+  // ── State ──
+  let tasks = [];
+  let currentStep = 0;
+  let secondsLeft = 0;
+  let totalSecondsLeft = 0;
+  let timerInterval = null;
+  let isPaused = false;
+  let stepDuration = 0;
+  let stepElapsed = 0;
+
+  // ── Notifications ──
+  function checkNotifBanner() {
+    if (!('Notification' in window)) return;
+    const banner = document.getElementById('notif-banner');
+    if (Notification.permission === 'default') {
+      banner.style.display = 'flex';
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
+  Sortable.create(document.getElementById('task-list'), {
+  animation: 150,
+  onEnd: function(evt) {
+    const moved = tasks.splice(evt.oldIndex, 1)[0];
+    tasks.splice(evt.newIndex, 0, moved);
+  }
+});
+
+  function requestNotifPermission() {
+    Notification.requestPermission().then(() => {
+      document.getElementById('notif-banner').classList.add('hidden');
+    });
+  }
+
+  function sendNotification(title, body) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    try {
+      const n = new Notification(title, {
+        body,
+        icon: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/23f1.svg',
+        silent: false
+      });
+      setTimeout(() => n.close(), 8000);
+    } catch(e) {}
+  }
+
+  // ── Audio ──
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  function beep(freq = 880, dur = 0.15, vol = 0.4, type = 'sine') {
+    try {
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = type;
+      gain.gain.setValueAtTime(vol, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.start(); osc.stop(ctx.currentTime + dur);
+    } catch(e) {}
+  }
+
+  function alertSound() {
+    beep(660, 0.12);
+    setTimeout(() => beep(880, 0.12), 140);
+    setTimeout(() => beep(1100, 0.2), 280);
+  }
+
+  function flash(color = 'rgba(232,197,71,0.18)') {
+    const el = document.getElementById('flash');
+    el.style.background = color;
+    el.classList.add('active');
+    setTimeout(() => el.classList.remove('active'), 300);
+  }
+
+  // ── Editor ──
+  function addTask(name = '', minutes = 25) {
+    tasks.push({ name, minutes, type: 'task' });
+    renderEditor();
+  }
+
+  function addPause(name = 'Pause', minutes = 5) {
+    tasks.push({ name, minutes, type: 'pause' });
+    renderEditor();
+  }
+
+  function removeTask(i) {
+    tasks.splice(i, 1);
+    renderEditor();
+  }
+
+  function toggleType(i) {
+    tasks[i].type = tasks[i].type === 'task' ? 'pause' : 'task';
+    if (tasks[i].type === 'pause' && !tasks[i].name.trim()) tasks[i].name = 'Pause';
+    renderEditor();
+  }
+
+  // Functions for Editor
+
+  function renderEditor() {
+    const list = document.getElementById('task-list');
+    list.innerHTML = '';
+    tasks.forEach((t, i) => {
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      row.innerHTML = `
+        <button class="type-toggle ${t.type === 'pause' ? 'is-pause' : ''}" onclick="toggleType(${i})">${t.type === 'pause' ? 'PAUSE' : 'TASK'}
+        </button>
+        <div class="drag-handle">
+          <span>▲</span>
+          <span>▼</span>
+        </div>
+        <input type="text" placeholder="${t.type === 'pause' ? 'Pause' : 'Task name…'}"
+               value="${escHtml(t.name)}"
+               class="${t.type === 'pause' ? 'pause-name' : ''}"
+               oninput="tasks[${i}].name=this.value" />
+        <div class="minutes-wrap"><input type="number" max="999" value="${t.minutes}" oninput="tasks[${i}].minutes=parseInt(this.value)||0;updateTotalLabel()" />
+        </div>
+        <button class="remove" onclick="removeTask(${i})">×</button>
+      `;
+      list.appendChild(row);
+    });
+
+    const total = tasks.reduce((s, t) => s + (parseInt(t.minutes) || 0), 0);
+    const h = Math.floor(total / 60), m = total % 60;
+    document.getElementById('total-time-label').textContent =
+      total > 0 ? (h > 0 ? `Total time: ${h}h ${m}m` : `Total time:${m}m`) : '';
+  }
+
+  function escHtml(s) {
+    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  // ── Session ──
+  function startSession() {
+    const valid = tasks.filter(t => t.minutes > 0);
+    if (valid.length === 0) return;
+    tasks.forEach((t, i) => { if (!t.name.trim()) t.name = t.type === 'pause' ? 'Pause' : `Task ${i+1}`; });
+
+    currentStep = 0;
+    totalSecondsLeft = tasks.reduce((s, t) => s + t.minutes * 60, 0);
+
+    document.getElementById('editor').style.display = 'none';
+    document.getElementById('done-view').style.display = 'none';
+    const tv = document.getElementById('timer-view');
+    tv.style.display = 'flex';
+
+    document.getElementById('step-total').textContent = tasks.length;
+    renderQueue();
+    startStep();
+  }
+
+  function startStep() {
+    const t = tasks[currentStep];
+    stepDuration = t.minutes * 60;
+    secondsLeft = stepDuration;
+    stepElapsed = 0;
+    isPaused = false;
+
+    const isPauseStep = t.type === 'pause';
+    const nameEl = document.getElementById('current-name');
+    nameEl.textContent = t.name;
+    nameEl.classList.toggle('is-pause', isPauseStep);
+
+    document.getElementById('type-badge').textContent = isPauseStep ? 'BREAK' : 'TASK';
+    document.getElementById('step-num').textContent = currentStep + 1;
+
+    const fill = document.getElementById('progress-fill');
+    fill.classList.toggle('is-pause', isPauseStep);
+    fill.style.width = '0%';
+
+    document.getElementById('pause-resume-btn').textContent = 'PAUSE';
+
+    const nextBtn = document.getElementById('next-btn');
+    nextBtn.textContent = currentStep < tasks.length - 1 ? 'SKIP →' : 'FINISH';
+
+    updateClock();
+    renderQueue();
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(tick, 1000);
+  }
+
+  function tick() {
+    if (isPaused) return;
+    secondsLeft--;
+    totalSecondsLeft--;
+    stepElapsed++;
+
+    updateClock();
+
+    const pct = (stepElapsed / stepDuration) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+
+    if (secondsLeft <= 0) {
+      clearInterval(timerInterval);
+      alertSound();
+      flash(tasks[currentStep].type === 'pause' ? 'rgba(107,197,168,0.2)' : 'rgba(232,197,71,0.2)');
+
+      // Windows notification
+      const finishedName = tasks[currentStep].name;
+      const nextTask = tasks[currentStep + 1];
+      const notifBody = nextTask
+        ? `Up next: ${nextTask.name} (${nextTask.minutes} min)`
+        : 'Session complete!';
+      sendNotification(`⏱ ${finishedName} done`, notifBody);
+
+      setTimeout(() => {
+        if (currentStep < tasks.length - 1) {
+          currentStep++;
+          totalSecondsLeft = tasks.slice(currentStep).reduce((s, t) => s + t.minutes * 60, 0);
+          startStep();
+        } else {
+          finishSession();
+        }
+      }, 800);
+    }
+  }
+
+  function updateClock() {
+    const m = Math.floor(secondsLeft / 60);
+    const s = secondsLeft % 60;
+    const str = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const clock = document.getElementById('clock');
+    clock.textContent = str;
+    clock.classList.toggle('warning', secondsLeft <= 60 && secondsLeft > 0 && tasks[currentStep].type !== 'pause');
+    clock.classList.toggle('is-pause', tasks[currentStep].type === 'pause');
+
+    const tr = totalSecondsLeft;
+    const th = Math.floor(tr / 3600);
+    const tm = Math.floor((tr % 3600) / 60);
+    const ts = tr % 60;
+    const totalStr = th > 0
+      ? `${th}h ${tm}m remaining in session`
+      : `${tm}m ${String(ts).padStart(2,'0')}s remaining in session`;
+    document.getElementById('total-left').textContent = totalStr;
+  }
+
+  function togglePause() {
+    isPaused = !isPaused;
+    const btn = document.getElementById('pause-resume-btn');
+    btn.textContent = isPaused ? 'RESUME' : 'PAUSE';
+    btn.style.borderColor = isPaused ? 'red' : 'green';
+    btn.style.color = isPaused ? 'green' : 'red';
+    beep(isPaused ? 440 : 660, 0.08);
+  }
+
+  function nextStep() {
+    clearInterval(timerInterval);
+    if (currentStep < tasks.length - 1) {
+      totalSecondsLeft -= secondsLeft;
+      currentStep++;
+      startStep();
+    } else {
+      finishSession();
+    }
+  }
+
+  function finishSession() {
+    clearInterval(timerInterval);
+    document.getElementById('timer-view').style.display = 'none';
+    const dv = document.getElementById('done-view');
+    dv.style.display = 'flex';
+    const taskCount = tasks.filter(t => t.type === 'task').length;
+    const pauseCount = tasks.filter(t => t.type === 'pause').length;
+    document.getElementById('done-stats').textContent =
+      `${taskCount} task${taskCount !== 1 ? 's' : ''} · ${pauseCount} break${pauseCount !== 1 ? 's' : ''} completed`;
+    sendNotification('✔ Session Complete!', `${taskCount} tasks finished. Great work!`);
+    alertSound(); setTimeout(alertSound, 500);
+  }
+
+  function backToEditor() {
+    clearInterval(timerInterval);
+    document.getElementById('timer-view').style.display = 'none';
+    document.getElementById('done-view').style.display = 'none';
+    document.getElementById('editor').style.display = 'block';
+    renderEditor();
+  }
+
+  function renderQueue() {
+    const q = document.getElementById('queue');
+    q.innerHTML = '';
+    tasks.forEach((t, i) => {
+      const item = document.createElement('div');
+      item.className = 'queue-item' +
+        (i === currentStep ? ' current' + (t.type === 'pause' ? ' is-pause' : '') : '') +
+        (i < currentStep ? ' done' : '');
+      item.innerHTML = `
+        <span class="queue-item-name">${escHtml(t.name)}</span>
+        <span class="queue-item-dur">${t.minutes}min</span>
+      `;
+      q.appendChild(item);
+    });
+  }
+
+  // ── Init ──
+  tasks = [
+    { name: 'Task 1', minutes: 30, type: 'task' },
+    { name: 'Pause',  minutes: 5,  type: 'pause' },
+    { name: 'Task 2', minutes: 25, type: 'task' },
+    { name: 'Task 3', minutes: 15, type: 'task' },
+    { name: 'Pause',  minutes: 5,  type: 'pause' },
+  ];
+  renderEditor();
+  checkNotifBanner();
+  
+function updateTotalLabel() {
+  const total = tasks.reduce((s, t) => s + (parseInt(t.minutes) || 0), 0);
+  const h = Math.floor(total / 60), m = total % 60;
+  document.getElementById('total-time-label').textContent =
+    total > 0 ? (h > 0 ? `Total time: ${h}h ${m}m` : `Total time: ${m}m`) : '';
+};
+
+</script>
+</body>
+</html>

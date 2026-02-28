@@ -1,7 +1,7 @@
 <!-- MilWoT - Mil Work Timer -->
 <!-- Simple workt timer with continues timers for tasks and pauses by Mil Stamenković -->
 <!-- © 2026 Mil Stamenković -->
-<!-- Version 5 Translate and Burger Menu -->
+<!-- Version E - Translate and Burger menu -->
 <!-- Created with help of Free Claude AI -->
 <!-- Created: 25.02.2026. - Ćuprija, Serbia -->
 <!-- Revised: 26.02.2026. - Ćuprija, Serbia -->
@@ -82,7 +82,7 @@
   }
 
   .subtitle {
-    font-size: 0.65rem;
+    font-size: 0.65em;
     color: var(--muted);
     letter-spacing: 3px;
     text-transform: uppercase;
@@ -96,7 +96,7 @@
     border-radius: 6px;
     color: var(--muted);
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.65em;
     letter-spacing: 2px;
     padding: 5px 10px;
     cursor: pointer;
@@ -200,7 +200,7 @@
     border-radius: 6px;
     color: var(--text);
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.65em;
     padding: 5px 10px;
     outline: none;
     text-align: center;
@@ -215,14 +215,14 @@
     border-color: var(--accent);
   }
 
-  .task-row button.remove {
+  .task-row button.emove {
     width: 28px;
     flex-shrink: 0;
     background: none;
     border: none;
     color: var(--accent);
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.1em;
     line-height: 1;
     padding: 4px 0;
     border-radius: 4px;
@@ -230,7 +230,7 @@
     transition: color 0.2s;
   }
 
-  .task-row button.remove:hover { color: var(--danger); }
+  .task-row button.emove:hover { color: var(--danger); }
 
   .editor-actions {
     display: flex;
@@ -245,7 +245,7 @@
     border-radius: 6px;
     color: var(--muted);
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.65em;
     padding: 10px;
     cursor: pointer;
     letter-spacing: 1px;
@@ -266,7 +266,7 @@
     border-radius: 6px;
     color: #0f0f0f;
     font-family: 'DM Mono', monospace;
-    font-size: 0.8rem;
+    font-size: 0.8em;
     font-weight: 800;
     padding: 10px 28px;
     cursor: pointer;
@@ -292,7 +292,7 @@
     border-radius: 9px;
     padding: 6px;
     margin-bottom: 10px;
-    font-size: 0.5rem;
+    font-size: 0.5em;
     color: var(--muted);
     align-items: center;
     justify-content: space-between;
@@ -322,6 +322,7 @@
     align-items: center;
     width: 100%;
     max-width: 560px;
+    gap: 0;
   }
 
   .progress-bar-wrap {
@@ -346,11 +347,11 @@
   }
 
   .step-label {
-    font-size: 0.65rem;
+    font-size: 0.65em;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
   .step-label span {
@@ -359,9 +360,8 @@
 
   .current-task-name {
     font-family: 'Playfair Display', serif;
-    font-size: 2.4rem;
+    font-size: 2.4em;
     text-align: center;
-    margin-bottom: 8px;
     line-height: 1.2;
     transition: color 0.4s;
   }
@@ -371,15 +371,15 @@
   }
 
   .type-badge {
-    font-size: 0.6rem;
+    font-size: 0.6em;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 40px;
+    margin-bottom: 20px;
   }
 
   .clock {
-    font-size: 5.5rem;
+    font-size: 3em;
     font-weight: 500;
     letter-spacing: -4px;
     line-height: 1;
@@ -395,7 +395,7 @@
     font-size: 0.5em;
     color: var(--muted);
     letter-spacing: 1px;
-    margin-bottom: 48px;
+    margin-bottom: 10px;
   }
 
   .controls {
@@ -410,10 +410,10 @@
     border-radius: 8px;
     color: var(--text);
     font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
+    font-size: 0.5em;
     letter-spacing: 2px;
     text-transform: uppercase;
-    padding: 12px 24px;
+    padding: 10px 20px;
     cursor: pointer;
     transition: all 0.2s;
   }
@@ -436,7 +436,7 @@
 
   /* Queue */
   .queue-title {
-    font-size: 0.6rem;
+    font-size: 0.6em;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--muted);
@@ -459,7 +459,7 @@
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 10px 16px;
-    font-size: 0.8rem;
+    font-size: 0.8em;
     opacity: 0.4;
     transition: opacity 0.3s;
   }
@@ -482,7 +482,7 @@
 
   .queue-item-dur {
     color: var(--muted);
-    font-size: 0.7rem;
+    font-size: 0.7em;
   }
 
   /* Flash overlay */
@@ -503,7 +503,7 @@
     border: none;
     color: var(--muted);
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.65em;
     letter-spacing: 2px;
     text-transform: uppercase;
     cursor: pointer;
@@ -523,14 +523,14 @@
 
   .done-big {
     font-family: 'Playfair Display', serif;
-    font-size: 3rem;
+    font-size: 3em;
     margin-bottom: 12px;
     color: var(--accent);
   }
 
   .done-sub {
     color: var(--muted);
-    font-size: 0.8rem;
+    font-size: 0.8em;
     margin-bottom: 32px;
   }
 
@@ -636,7 +636,7 @@
     background: none;
     border: none;
     color: var(--accent);
-    font-size: 1.3rem;
+    font-size: 1.3em;
     cursor: pointer;
     line-height: 1;
     transition: color 0.2s;
@@ -646,7 +646,7 @@
 
   .menu-heading {
     font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
+    font-size: 1.1em;
     color: var(--text);
     margin-bottom: 4px;
     letter-spacing: 1px;
@@ -666,7 +666,7 @@
     border-radius: 7px;
     cursor: pointer;
     transition: background 0.15s;
-    font-size: 0.75rem;
+    font-size: 0.75em;
     letter-spacing: 1px;
     color: var(--text);
     border: none;
@@ -730,7 +730,7 @@
     border: none;
     color: var(--accent);
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.65em;
     letter-spacing: 2px;
     cursor: pointer;
     text-align: left;
@@ -743,13 +743,13 @@
 
   .subpanel-title {
     font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
+    font-size: 1.1em;
     color: var(--text);
     margin-bottom: 4px;
   }
 
   .subpanel-body {
-    font-size: 0.7rem;
+    font-size: 0.7em;
     color: var(--muted);
     line-height: 1.8;
   }
@@ -908,7 +908,7 @@
       btnEdit:          '← Edit session',
       doneTitle:        'Session Complete',
       btnNewSession:    'NEW SESSION',
-      remainingSession: 'remaining in session',
+      emainingSession: 'emaining in session',
       taskLabel:        'TASK',
       pauseLabel:       'PAUSE',
       taskPlaceholder:  'Task name…',
@@ -949,7 +949,7 @@
       btnEdit:          'SR: ← Edit session',               
       doneTitle:        'SR: Session Complete',             
       btnNewSession:    'SR: NEW SESSION',                  
-      remainingSession: 'SR: remaining in session',         
+      emainingSession: 'SR: emaining in session',         
       taskLabel:        'РАД',                         
       pauseLabel:       'ПАУЗА',                        
       taskPlaceholder:  'Рад',                   
@@ -1051,7 +1051,7 @@
   }
 
   function closeMenu() {
-    document.getElementById('menu-overlay').classList.remove('open');
+    document.getElementById('menu-overlay').classList.emove('open');
   }
 
   function handleOverlayClick(e) {
@@ -1072,8 +1072,8 @@
   }
 
   function showMenuMain() {
-    document.getElementById('menu-main').classList.remove('hidden');
-    document.getElementById('menu-subpanel').classList.remove('open');
+    document.getElementById('menu-main').classList.emove('hidden');
+    document.getElementById('menu-subpanel').classList.emove('open');
   }
 
   function applyMenuText() {
@@ -1165,7 +1165,7 @@
     const el = document.getElementById('flash');
     el.style.background = color;
     el.classList.add('active');
-    setTimeout(() => el.classList.remove('active'), 300);
+    setTimeout(() => el.classList.emove('active'), 300);
   }
 
   // ── Editor ──
@@ -1179,7 +1179,7 @@
     renderEditor();
   }
 
-  function removeTask(i) {
+  function emoveTask(i) {
     tasks.splice(i, 1);
     renderEditor();
   }
@@ -1212,7 +1212,7 @@
           <input type="number" max="999" value="${t.minutes}"
                  oninput="tasks[${i}].minutes=parseInt(this.value)||0;updateTotalLabel()" />
         </div>
-        <button class="remove" onclick="removeTask(${i})">×</button>
+        <button class="emove" onclick="emoveTask(${i})">×</button>
       `;
       list.appendChild(row);
     });
@@ -1342,8 +1342,8 @@
     const tm = Math.floor((tr % 3600) / 60);
     const ts = tr % 60;
     const totalStr = th > 0
-      ? `${th}h ${tm}m ${l.remainingSession}`
-      : `${tm}m ${String(ts).padStart(2,'0')}s ${l.remainingSession}`;
+      ? `${th}h ${tm}m ${l.emainingSession}`
+      : `${tm}m ${String(ts).padStart(2,'0')}s ${l.emainingSession}`;
     document.getElementById('total-left').textContent = totalStr;
   }
 

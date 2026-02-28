@@ -1,21 +1,31 @@
 <!-- MilWoT - Mil Work Timer -->
-<!-- Simple workt timer with continues timers for tasks and pauses by Mil Stamenković -->
+<!-- Simple work timer with continues timers for tasks and pauses by Mil Stamenković -->
 <!-- © 2026 Mil Stamenković -->
-<!-- Version 5 Translate -->
+<!-- Version F -->
 <!-- Created with help of Free Claude AI -->
-<!-- Created: 25.02.2026. - Ćuprija, Serbia -->
-<!-- Revised: 25.02.2026. - Ćuprija, Serbia -->
+<!-- Created: 27.02.2026. - Ćuprija, Serbia -->
+<!-- Revised: 27.02.2026. - Ćuprija, Serbia -->
 
 <!--    TO DO    -->
-<!-- ✔) OFFLINE mode if possible -->
-<!-- ✔) MAIN SCREEN: Entering time stays inside input field -->
-<!-- ✔) MAIN SCREEN: Drag to reorder tasks -->
-<!-- ✔) OPTIONS: Auto-language: Serbian Latin; English -->
-<!-- 5) BURGER MENU: Language; Light/Dark theme  -->
-<!-- 6) TIMER SCREEN: Shorter, not taking so much height on screen -->
-<!-- 7) TIMER SCREEN: Reset button -->
-<!-- 8) Add EXPLANATION Page & Copyright page -->
-<!-- 9) ... -->
+<!--  ✔) OFFLINE mode if possible -->
+<!--  ✔) MAIN SCREEN: Entering time stays inside input field -->
+<!--  ✔) MAIN SCREEN: Drag to reorder tasks -->
+<!--  ✔) OPTIONS: Auto-language: Serbian Latin; English -->
+<!--  ✔) BURGER MENU: Language; Light/Dark theme  -->
+<!--  ✔) POP-UP menu for LANG, COPYRIGHT, COLOR, etc. -->
+<!--  ✔) TIMER SCREEN: Shorter, not taking so much height on screen -->
+<!--  x) FIX the Burger menu not working! -->
+<!--  7) TIMER SCREEN: Reset button -->
+<!--  8) Add EXPLANATION Page & Copyright page -->
+<!--  9) Creat LOGO and ICONS with LOGO -->
+<!-- 10) TRANSLATE 100% all -->
+<!-- 10) TRANSLATE 100% all -->
+<!-- 12) Finish it as fully-offline-any-device-PWA -->
+<!-- 13) ... -->
+<!--  *) FUTURE - Ambient sounds. Rain, hum, keyboards typing, etc. -->
+
+<!-- FIX problem with NOTIFICATIONS. -->
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -75,7 +85,7 @@
   }
 
   .subtitle {
-    font-size: 0.65rem;
+    font-size: 0.65em;
     color: var(--muted);
     letter-spacing: 3px;
     text-transform: uppercase;
@@ -89,7 +99,7 @@
     border-radius: 6px;
     color: var(--muted);
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.65em;
     letter-spacing: 2px;
     padding: 5px 10px;
     cursor: pointer;
@@ -193,7 +203,7 @@
     border-radius: 6px;
     color: var(--text);
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.65em;
     padding: 5px 10px;
     outline: none;
     text-align: center;
@@ -208,14 +218,14 @@
     border-color: var(--accent);
   }
 
-  .task-row button.remove {
+  .task-row button.emove {
     width: 28px;
     flex-shrink: 0;
     background: none;
     border: none;
     color: var(--accent);
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.1em;
     line-height: 1;
     padding: 4px 0;
     border-radius: 4px;
@@ -223,7 +233,7 @@
     transition: color 0.2s;
   }
 
-  .task-row button.remove:hover { color: var(--danger); }
+  .task-row button.emove:hover { color: var(--danger); }
 
   .editor-actions {
     display: flex;
@@ -238,7 +248,7 @@
     border-radius: 6px;
     color: var(--muted);
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.65em;
     padding: 10px;
     cursor: pointer;
     letter-spacing: 1px;
@@ -259,7 +269,7 @@
     border-radius: 6px;
     color: #0f0f0f;
     font-family: 'DM Mono', monospace;
-    font-size: 0.8rem;
+    font-size: 0.8em;
     font-weight: 800;
     padding: 10px 28px;
     cursor: pointer;
@@ -285,7 +295,7 @@
     border-radius: 9px;
     padding: 6px;
     margin-bottom: 10px;
-    font-size: 0.5rem;
+    font-size: 0.5em;
     color: var(--muted);
     align-items: center;
     justify-content: space-between;
@@ -315,14 +325,104 @@
     align-items: center;
     width: 100%;
     max-width: 560px;
+    gap: 0;
   }
 
+  .step-label {
+    font-size: 0.65em;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .step-label span {
+    color: var(--accent);
+  }
+  
+  .current-task-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1em;
+    text-align: center;
+    line-height: 1.2;
+    transition: color 0.4s;
+    margin-top: 10px;
+  }
+
+  .current-task-name.is-pause {
+    color: var(--pause-accent);
+  }
+
+  .type-badge {
+    font-size: 0.6em;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .clock {
+    font-size: 2em;
+    font-weight: 500;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin: 10px;
+    transition: color 0.3s;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .clock.warning { color: var(--danger); }
+  .clock.is-pause { color: var(--pause-accent); }
+
+  .total-left {
+    font-size: 0.5em;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+
+  .ctrl-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.5em;
+    font-weight: 1000;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .ctrl-btn.skip {
+    background: #ff0000 !important;
+    border: 0 solid;
+    color: #0f0f0f;
+  }
+
+  .ctrl-btn.skip:hover {
+    opacity: 0.85;
+    color: #0f0f0f;
+  }
+
+  /* Progress Bar */
   .progress-bar-wrap {
-    width: 100%;
+    width: 70%;
     height: 2px;
     background: var(--border);
     border-radius: 2px;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     overflow: hidden;
   }
 
@@ -338,107 +438,17 @@
     background: var(--pause-accent);
   }
 
-  .step-label {
-    font-size: 0.65rem;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .step-label span {
-    color: var(--accent);
-  }
-
-  .current-task-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.4rem;
-    text-align: center;
-    margin-bottom: 8px;
-    line-height: 1.2;
-    transition: color 0.4s;
-  }
-
-  .current-task-name.is-pause {
-    color: var(--pause-accent);
-  }
-
-  .type-badge {
-    font-size: 0.6rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 40px;
-  }
-
-  .clock {
-    font-size: 5.5rem;
-    font-weight: 500;
-    letter-spacing: -4px;
-    line-height: 1;
-    margin-bottom: 12px;
-    transition: color 0.3s;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .clock.warning { color: var(--danger); }
-  .clock.is-pause { color: var(--pause-accent); }
-
-  .total-left {
-    font-size: 0.5em;
-    color: var(--muted);
-    letter-spacing: 1px;
-    margin-bottom: 48px;
-  }
-
-  .controls {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 48px;
-  }
-
-  .ctrl-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 12px 24px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .ctrl-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  .ctrl-btn.primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #0f0f0f;
-  }
-
-  .ctrl-btn.primary:hover {
-    opacity: 0.85;
-    color: #0f0f0f;
-  }
-
   /* Queue */
   .queue-title {
-    font-size: 0.6rem;
+    font-size: 0.6em;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--muted);
     margin-bottom: 16px;
-    align-self: flex-start;
   }
 
   .queue {
-    width: 100%;
+    width: 70%;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -452,7 +462,7 @@
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 10px 16px;
-    font-size: 0.8rem;
+    font-size: 0.8em;
     opacity: 0.4;
     transition: opacity 0.3s;
   }
@@ -475,7 +485,7 @@
 
   .queue-item-dur {
     color: var(--muted);
-    font-size: 0.7rem;
+    font-size: 0.7em;
   }
 
   /* Flash overlay */
@@ -496,7 +506,7 @@
     border: none;
     color: var(--muted);
     font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.65em;
     letter-spacing: 2px;
     text-transform: uppercase;
     cursor: pointer;
@@ -516,14 +526,14 @@
 
   .done-big {
     font-family: 'Playfair Display', serif;
-    font-size: 3rem;
+    font-size: 3em;
     margin-bottom: 12px;
     color: var(--accent);
   }
 
   .done-sub {
     color: var(--muted);
-    font-size: 0.8rem;
+    font-size: 0.8em;
     margin-bottom: 32px;
   }
 
@@ -567,19 +577,218 @@
 
   .drag-handle:active { cursor: grabbing; }
 
+  /* ── BURGER BUTTON ── */
+  #burger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 4px;
+    flex-shrink: 0;
+  }
+
+  #burger-btn span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--muted);
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+
+  #burger-btn:hover span { background: var(--accent); }
+
+  /* ── MENU OVERLAY ── */
+  #menu-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #menu-overlay.open { display: flex; }
+
+  #menu-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    animation: popIn 0.15s ease;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  #menu-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 1.3em;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  #menu-close:hover { color: var(--accent); }
+
+  .menu-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1em;
+    color: var(--text);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+
+  .menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 0;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 0.75em;
+    letter-spacing: 1px;
+    color: var(--text);
+    border: none;
+    background: none;
+    width: 100%;
+    font-family: 'DM Mono', monospace;
+    text-align: left;
+  }
+
+  .menu-item:hover { background: var(--border); }
+
+  .menu-item-left { display: flex; align-items: center; gap: 10px; }
+
+  .menu-item.placeholder {
+    opacity: 0.35;
+    cursor: default;
+    font-style: italic;
+  }
+
+  .menu-item.placeholder:hover { background: none; }
+
+  /* Toggle switch */
+  .toggle-switch { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+  .toggle-switch input { display: none; }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 20px;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: var(--muted);
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  .toggle-switch input:checked + .toggle-track { background: var(--accent); }
+  .toggle-switch input:checked + .toggle-track::after {
+    transform: translateX(16px);
+    background: #fff;
+  }
+
+  /* Subpanel */
+  #menu-subpanel { display: none; flex-direction: column; gap: 10px; }
+  #menu-subpanel.open { display: flex; }
+  #menu-main { display: flex; flex-direction: column; gap: 6px; }
+  #menu-main.hidden { display: none; }
+
+  .subpanel-back {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65em;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+    margin-bottom: 4px;
+    transition: color 0.2s;
+  }
+
+  .subpanel-back:hover { color: var(--accent); }
+
+  .subpanel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1em;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .subpanel-body {
+    font-size: 0.7em;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  /* Light theme */
+  body.light {
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --border: #dddddd;
+    --text: #2a2a2a;
+    --muted: #999999;
+  }
+
+
 </style>
 </head>
 <body>
 
 <div id="flash"></div>
+  
+  <h1 style="text-decoration: underline; text-underline-offset: 0.3em">MilWoT</h1>
 
-<h1 style="text-decoration: underline; text-underline-offset: 0.3em">MilWoT</h1>
-<p id="appNameTitle"><span style="color:red">Mil</span> <span style="color:red">Wo</span>rk <span style="color:red">T</span>imer</p>
-<p id="createdBy" style="font-size: 0.75em; font-style: italic;">Created by Mil Stamenković</p>
-<br>
-<div style="display:flex; align-items:center; justify-content:center; gap:30px; margin-bottom:30px;">
-  <p class="subtitle" id="subtitle" style="margin-bottom:0; line-height:1">Work - Relax - Repeat</p>
-  <button id="lang-btn" onclick="toggleLang()">SR</button>
+  <div id="header-section" style="display:flex; flex-direction:column; align-items:center;">
+
+    <p id="appNameTitle"><span style="color:red">Mil</span> <span style="color:red">Wo</span>rk <span style="color:red">T</span>imer</p>
+    <p id="createdBy" style="font-size: 0.75em; font-style: italic;">Created by Mil Stamenković</p>
+    <br>
+    <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:30px;">
+      <p class="subtitle" id="subtitle" style="margin-bottom:0; line-height:1">Work - Relax - Repeat</p>
+      <button id="burger-btn" onclick="openMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  
+  </div>
+
 </div>
 
 <!-- Notification permission banner -->
@@ -587,6 +796,52 @@
   <span style="text-align: center;" id="notif-text">Enable notifications for this website for Alarm</span>
   <button onclick="requestNotifPermission()" id="notif-btn">Enable</button>
   <p style="font-style: italic; text-align: center;" id="notif-pwa">Install this page as PWA for easier & offline use.</p>
+</div>
+
+<!-- ── BURGER MENU OVERLAY ── -->
+<div id="menu-overlay" onclick="handleOverlayClick(event)">
+  <div id="menu-panel">
+    <button id="menu-close" onclick="closeMenu()">×</button>
+    <div id="menu-main">
+      <div class="menu-heading">MilWoT</div>
+      <div class="menu-divider"></div>
+      <div class="menu-item">
+        <div class="menu-item-left"><span>🌐</span><span id="menu-lang-label">Serbian / Srpski</span></div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="lang-toggle" onchange="menuToggleLang()">
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+      <div class="menu-item">
+      <div class="menu-item-left">
+        <span id="menu-theme-icon">☀️</span>
+        <span id="menu-theme-label">Light theme</span>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
+        <div class="toggle-track"></div>
+      </label>
+    </div>
+      <div class="menu-divider"></div>
+      <button class="menu-item" onclick="showSubpanel('readme')">
+        <div class="menu-item-left"><span>📖</span><span id="menu-readme-label">Read Me</span></div>
+        <span style="color:var(--muted)">›</span>
+      </button>
+      <button class="menu-item" onclick="showSubpanel('copyright')">
+        <div class="menu-item-left"><span>©</span><span id="menu-copyright-label">Copyright</span></div>
+        <span style="color:var(--muted)">›</span>
+      </button>
+      <div class="menu-divider"></div>
+      <div class="menu-item placeholder">
+        <div class="menu-item-left"><span>⚙️</span><span id="menu-placeholder-label">Coming soon…</span></div>
+      </div>
+    </div>
+    <div id="menu-subpanel">
+      <button id="subpanel-back" class="subpanel-back" onclick="showMenuMain()">← Back</button>
+      <div class="subpanel-title" id="subpanel-title"></div>
+      <div class="subpanel-body" id="subpanel-body"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ── EDITOR ── -->
@@ -613,17 +868,17 @@
 
 <!-- ── TIMER ── -->
 <div id="timer-view">
-  <div class="progress-bar-wrap">
-    <div class="progress-bar-fill" id="progress-fill"></div>
-  </div>
   <div class="step-label" id="step-label-text">Step <span id="step-num">1</span> of <span id="step-total">1</span></div>
   <div class="current-task-name" id="current-name">Task</div>
   <div class="type-badge" id="type-badge">TASK</div>
   <div class="clock" id="clock">00:00</div>
   <div class="total-left" id="total-left"></div>
   <div class="controls">
-    <button class="ctrl-btn" id="pause-resume-btn" onclick="togglePause()">PAUSE</button>
-    <button class="ctrl-btn primary" id="next-btn" onclick="nextStep()">SKIP →</button>
+    <button class="ctrl-btn pause-resume" id="pause-resume-btn" onclick="togglePause()">PAUSE</button>
+    <button class="ctrl-btn skip" id="skip-btn" onclick="nextStep()">SKIP →</button>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill"></div>
   </div>
   <div class="queue-title" id="queue-title">Up Next</div>
   <div class="queue" id="queue"></div>
@@ -663,7 +918,7 @@
       btnEdit:          '← Edit session',
       doneTitle:        'Session Complete',
       btnNewSession:    'NEW SESSION',
-      remainingSession: 'remaining in session',
+      emainingSession: 'emaining in session',
       taskLabel:        'TASK',
       pauseLabel:       'PAUSE',
       taskPlaceholder:  'Task name…',
@@ -683,8 +938,8 @@
       headerName:       'Task name',
     },
     sr: {
-      subtitle:         'SR: Work - Relax - Repeat',       
-      notifText:        'Одобри нотификације за овај вебсајт за аларм.',      
+      subtitle:         'Рад - Одмор - Поново',       
+      notifText:        'Одобрите нотификације за овај вебсајт за аларм.',      
       notifBtn:         'Одобри',                       
       notifPwa:         'Инсталирајте ову страницу као "PWA" за лакшу и офлајн употребу.', 
       headerType:       'Тип',                        
@@ -704,7 +959,7 @@
       btnEdit:          'SR: ← Edit session',               
       doneTitle:        'SR: Session Complete',             
       btnNewSession:    'SR: NEW SESSION',                  
-      remainingSession: 'SR: remaining in session',         
+      emainingSession: 'SR: emaining in session',         
       taskLabel:        'РАД',                         
       pauseLabel:       'ПАУЗА',                        
       taskPlaceholder:  'Рад',                   
@@ -764,6 +1019,95 @@
       }
     });
     updateTotalLabel();
+  }
+  // ── Burger Menu ──
+  const menuText = {
+    en: {
+      langLabel:        'Притисните за српски',
+      themeLabelDark:   'Toggle for Dark theme',
+      themeLabelLight:  'Toggle for Light theme',
+      readmeLabel:      'Read Me',
+      copyrightLabel:   'Copyright',
+      placeholderLabel: 'Coming soon...',
+      subpanelBack:     '← Back',
+      readmeTitle:      'Read Me',
+      readmeBody:       '"MilWoT" is a simple work timer.\n\nAdd tasks and pauses, set their durations, then hit START. The timer runs through your session automatically and alerts you when each step ends.\n\nTip: Drag the ▲▼ handle to reorder tasks.\nClick TASK/PAUSE to toggle the type.',
+      copyrightTitle:   'Copyright',
+      copyrightBody:    '© 2026 Mil Stamenković\nĆuprija, Serbia\n\nCreated with help of Claude AI.\nAll rights reserved.',
+    },
+    sr: {
+      langLabel:        'Toggle for English',
+      themeLabelDark:   'Притисните за тамну тему',
+      themeLabelLight:  'Притисните за светлу тему',      
+      readmeLabel:      'Упутство',            
+      copyrightLabel:   'Ауторска права',      
+      placeholderLabel: 'Ускоро...',             
+      backLabel:        '← Назад',             
+      subpanelBack:     '← Назад',
+      readmeTitle:      'Упутство',
+      readmeBody:       '"MilWoT" је једноставан тајмер за рад.\n\nДодајте задатке и паузе, подесите њихова трајања, затим кликните ПОЧНИ. Тајмер иде кроз сесију аутоматски и обавештава Вас када се сваки корак заврши.\n\nСавет: Користите ▲▼ ручице да промените редослед.\nКликните на РАД/ПАУЗА да промените тип.',
+      copyrightTitle:   'Ауторска права',
+      copyrightBody:    '© 2026 Милан Стаменковић\nЋуприја, Србија\n\nНаправљено уз помоћ бесплатног "Claude AI".\nСва права задржана.',
+    }
+  };
+
+  function openMenu() {
+    showMenuMain();
+    // Sync toggles with current state
+    document.getElementById('lang-toggle').checked = currentLang === 'sr';
+    document.getElementById('theme-toggle').checked = document.body.classList.contains('light');
+    applyMenuText();
+    document.getElementById('menu-overlay').classList.add('open');
+  }
+
+  function closeMenu() {
+    document.getElementById('menu-overlay').classList.emove('open');
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('menu-overlay')) closeMenu();
+  }
+
+  function showSubpanel(type) {
+    const m = menuText[currentLang];
+    document.getElementById('menu-main').classList.add('hidden');
+    document.getElementById('menu-subpanel').classList.add('open');
+    if (type === 'readme') {
+      document.getElementById('subpanel-title').textContent = m.readmeTitle;
+      document.getElementById('subpanel-body').innerHTML = m.readmeBody.replace(/\n/g, '<br>');
+    } else {
+      document.getElementById('subpanel-title').textContent = m.copyrightTitle;
+      document.getElementById('subpanel-body').innerHTML = m.copyrightBody.replace(/\n/g, '<br>');
+    }
+  }
+
+  function showMenuMain() {
+    document.getElementById('menu-main').classList.emove('hidden');
+    document.getElementById('menu-subpanel').classList.emove('open');
+  }
+
+  function applyMenuText() {
+    const m = menuText[currentLang];
+    document.getElementById('menu-lang-label').textContent      = m.langLabel;
+    const isLight = document.body.classList.contains('light'); document.getElementById('menu-theme-label').textContent = isLight ? m.themeLabelDark : m.themeLabelLight;
+    document.getElementById('menu-readme-label').textContent    = m.readmeLabel;
+    document.getElementById('menu-copyright-label').textContent = m.copyrightLabel;
+    document.getElementById('menu-placeholder-label').textContent = m.placeholderLabel;
+    document.getElementById('subpanel-back').textContent = m.subpanelBack;
+    document.getElementById('menu-theme-icon').textContent = isLight ? '🌙' : '☀️';
+  }
+
+  function menuToggleLang() {
+    currentLang = document.getElementById('lang-toggle').checked ? 'sr' : 'en';
+    applyLang();
+    applyMenuText();
+  }
+
+  function toggleTheme() {
+  const isLight = document.getElementById('theme-toggle').checked;
+  document.body.classList.toggle('light', isLight);
+  document.getElementById('menu-theme-icon').textContent  = isLight ? '🌙' : '☀️';
+  document.getElementById('menu-theme-label').textContent = isLight ? menuText[currentLang].themeLabelDark : menuText[currentLang].themeLabelLight;
   }
 
   // ── State ──
@@ -831,7 +1175,7 @@
     const el = document.getElementById('flash');
     el.style.background = color;
     el.classList.add('active');
-    setTimeout(() => el.classList.remove('active'), 300);
+    setTimeout(() => el.classList.emove('active'), 300);
   }
 
   // ── Editor ──
@@ -845,7 +1189,7 @@
     renderEditor();
   }
 
-  function removeTask(i) {
+  function emoveTask(i) {
     tasks.splice(i, 1);
     renderEditor();
   }
@@ -878,7 +1222,7 @@
           <input type="number" max="999" value="${t.minutes}"
                  oninput="tasks[${i}].minutes=parseInt(this.value)||0;updateTotalLabel()" />
         </div>
-        <button class="remove" onclick="removeTask(${i})">×</button>
+        <button class="emove" onclick="emoveTask(${i})">×</button>
       `;
       list.appendChild(row);
     });
@@ -910,6 +1254,7 @@
     currentStep = 0;
     totalSecondsLeft = tasks.reduce((s, t) => s + t.minutes * 60, 0);
 
+    document.getElementById('header-section').style.display = 'none';
     document.getElementById('editor').style.display = 'none';
     document.getElementById('done-view').style.display = 'none';
     document.getElementById('timer-view').style.display = 'flex';
@@ -948,7 +1293,7 @@
     btn.style.borderColor = 'green';
     btn.style.color = 'green';
 
-    document.getElementById('next-btn').textContent =
+    document.getElementById('skip-btn').textContent =
       currentStep < tasks.length - 1 ? l.btnSkip : l.btnFinish;
 
     updateClock();
@@ -1008,8 +1353,8 @@
     const tm = Math.floor((tr % 3600) / 60);
     const ts = tr % 60;
     const totalStr = th > 0
-      ? `${th}h ${tm}m ${l.remainingSession}`
-      : `${tm}m ${String(ts).padStart(2,'0')}s ${l.remainingSession}`;
+      ? `${th}h ${tm}m ${l.emainingSession}`
+      : `${tm}m ${String(ts).padStart(2,'0')}s ${l.emainingSession}`;
     document.getElementById('total-left').textContent = totalStr;
   }
 
@@ -1018,8 +1363,8 @@
     isPaused = !isPaused;
     const btn = document.getElementById('pause-resume-btn');
     btn.textContent       = isPaused ? l.btnResume : l.btnPause;
-    btn.style.borderColor = isPaused ? 'red' : 'green';
-    btn.style.color       = isPaused ? 'red' : 'green';
+    btn.style.borderColor = isPaused ? 'red'   : 'green';
+    btn.style.color       = isPaused ? 'green' : 'red';
     beep(isPaused ? 440 : 660, 0.08);
   }
 
@@ -1049,6 +1394,7 @@
 
   function backToEditor() {
     clearInterval(timerInterval);
+    document.getElementById('header-section').style.display = 'flex';
     document.getElementById('timer-view').style.display = 'none';
     document.getElementById('done-view').style.display = 'none';
     document.getElementById('editor').style.display = 'block';
