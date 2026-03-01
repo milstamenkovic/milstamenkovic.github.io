@@ -572,6 +572,7 @@
     gap: 5px;
     padding: 4px;
     flex-shrink: 0;
+    cursor: help;
   }
 
   #burger-btn span {
@@ -751,13 +752,21 @@
   }
 
   /* Rain Audio Player */
-  #rain-player {
-  position: fixed;
-  bottom: 30%;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
+  #rain-btn {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 100px;
+    background-color: var(--bg);
+    color: #008000;
+    font-weight: bold;
+    border: 3px solid red;
+    border-radius: 10px;
+    position: fixed;
+    bottom: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+  }
 
 </style>
 </head>
@@ -887,7 +896,7 @@
 <!-- AUDIO PLAYER -->
 
 <div id="rain-player">
-  <button onclick="toggleAudio()" id="audio-btn">Play/Pause Rain</button>
+  <button onclick="toggleAudio()" id="rain-btn"></button>
 </div>
 
 <script>
@@ -934,6 +943,8 @@
       createdBy:        'Created by Mil Stamenković',
       appNameTitle:     '<span style="color:red">Mil</span> <span style="color:red">Wo</span>rk <span style="color:red">T</span>imer',
       headerName:       'Task name',
+      audioPlay:        'Play rain',
+      audioPause:       'Pause rain',
     },
     sr: {
       subtitle:         'Рад - Одмор - Поново',       
@@ -974,7 +985,9 @@
       minLabel:         'мин',   
       createdBy:        'Направио Милан Стаменковић',
       appNameTitle:     'Миланов радни тајмер',   
-      headerName:       'Име задатка',         
+      headerName:       'Име задатка',
+      audioPlay:        'Пусти кишу',
+      audioPause:       'Паузирај кишу',      
     }
   };
 
@@ -1015,6 +1028,10 @@
       if (toggle && tasks[i]) {
         toggle.textContent = tasks[i].type === 'pause' ? l.pauseLabel : l.taskLabel;
       }
+      const rainBtn = document.getElementById('rain-btn');
+      if (rainBtn) {
+        rainBtn.textContent = audio.paused ? l.audioPlay : l.audioPause;
+      }
     });
     updateTotalLabel();
   }
@@ -1046,7 +1063,7 @@
       readmeBody:       '"MilWoT" је једноставан тајмер за рад.\n\nДодајте задатке и паузе, подесите њихова трајања, затим кликните ПОЧНИ. Тајмер иде кроз сесију аутоматски и обавештава Вас када се сваки корак заврши.\n\nСавет: Користите ▲▼ ручице да промените редослед.\nКликните на РАД/ПАУЗА да промените тип.',
       copyrightTitle:   'Ауторска права',
       copyrightBody:    '© 2026 Милан Стаменковић\nЋуприја, Србија\n\nНаправљено уз помоћ бесплатног "Claude AI".\nСва права задржана.',
-    }
+    },
   };
 
   function openMenu() {
@@ -1182,6 +1199,22 @@
     audio.volume = 0.5;
     audio.play();
 
+  function toggleAudio() {
+  const btn = document.getElementById('rain-btn');
+  const l = lang[currentLang];
+  if (audio.paused) {
+    audio.play();
+    btn.textContent = l.audioPause;
+    btn.style.borderColor = 'green';
+    btn.style.color = 'green';
+  } else {
+    audio.pause();
+    btn.textContent = l.audioPlay;
+    btn.style.borderColor = 'red';
+    btn.style.color = 'red';
+  }
+}
+
   // ── Editor ──
   function addTask(name = '', minutes = 25) {
     tasks.push({ name, minutes, type: 'task' });
@@ -1193,7 +1226,7 @@
     renderEditor();
   }
 
-  function emoveTask(i) {
+  function removeTask(i) {
     tasks.splice(i, 1);
     renderEditor();
   }
@@ -1431,6 +1464,9 @@
   ];
   renderEditor();
   checkNotifBanner();
+
+  document.getElementById('rain-btn').textContent = lang[currentLang].audioPlay;
+
 
   Sortable.create(document.getElementById('task-list'), {
     handle: '.drag-handle',
