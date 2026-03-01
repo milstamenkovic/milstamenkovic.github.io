@@ -1,6 +1,6 @@
 {
-  "name": "SkyCast — Weather Intelligence",
-  "short_name": "SkyCast",
+  "name": "MilWeNo — Mil Weather Notifications",
+  "short_name": "MilWeNo",
   "description": "Multi-source weather reports with smart alerts for heat, cold, storms and snow.",
   "start_url": "./",
   "display": "standalone",

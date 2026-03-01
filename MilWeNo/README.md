@@ -1,4 +1,4 @@
-# SkyCast — Weather PWA
+# MilWeNo - Mil Weather Notifications
 
 A progressive web app that gathers and presents weather data with smart desktop notifications.
 

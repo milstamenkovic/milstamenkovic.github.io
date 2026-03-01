@@ -1,4 +1,4 @@
-const CACHE_NAME = 'skycast-v1';
+const CACHE_NAME = 'milweno-v1';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -42,7 +42,7 @@ self.addEventListener('fetch', (event) => {
 
 // Handle push notifications (for future server-side push)
 self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : { title: 'SkyCast Alert', body: 'Weather update available' };
+  const data = event.data ? event.data.json() : { title: 'MilWeNo Alert', body: 'Weather update available' };
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
