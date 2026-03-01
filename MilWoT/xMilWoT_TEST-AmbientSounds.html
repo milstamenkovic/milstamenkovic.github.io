@@ -1162,6 +1162,12 @@
     setTimeout(() => el.classList.remove('active'), 300);
   }
 
+  // AMBIENT SOUNDS PLAYER
+  const audio = new Audio('../../media/audio/dragon-studio-gentle-rain-07-437321.mp3');
+    audio.loop = true;
+    audio.volume = 0.5;
+    audio.play();
+
   // ── Editor ──
   function addTask(name = '', minutes = 25) {
     tasks.push({ name, minutes, type: 'task' });
