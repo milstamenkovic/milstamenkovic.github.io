@@ -1196,8 +1196,7 @@
   // AMBIENT SOUNDS PLAYER
   const audio = new Audio('../../media/audio/dragon-studio-calming-rain-419010.mp3');
     audio.loop = true;
-    audio.volume = 0.5;
-    audio.play();
+    audio.volume = 0.3;
 
   function toggleAudio() {
   const btn = document.getElementById('rain-btn');
@@ -1457,16 +1456,15 @@
   // ── Init ──
   tasks = [
     { name: '...', minutes: 0, type: 'task' },
-    { name: '...',  minutes: 0,  type: 'pause' },
+    { name: '...', minutes: 0, type: 'pause' },
     { name: '...', minutes: 0, type: 'task' },
     { name: '...', minutes: 0, type: 'task' },
-    { name: '...',  minutes: 0,  type: 'pause' },
+    { name: '...', minutes: 0, type: 'pause' },
   ];
   renderEditor();
   checkNotifBanner();
 
   document.getElementById('rain-btn').textContent = lang[currentLang].audioPlay;
-
 
   Sortable.create(document.getElementById('task-list'), {
     handle: '.drag-handle',
