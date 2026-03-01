@@ -750,6 +750,14 @@
     --muted: #999999;
   }
 
+  /* Rain Audio Player */
+  #rain-player {
+  position: fixed;
+  bottom: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 
 </style>
 </head>
@@ -874,6 +882,12 @@
   <div class="done-big" id="done-title">Session Complete</div>
   <div class="done-sub" id="done-stats"></div>
   <button class="start-btn" onclick="backToEditor()" id="btn-new-session">NEW SESSION</button>
+</div>
+
+<!-- AUDIO PLAYER -->
+
+<div id="rain-player">
+  <button onclick="toggleAudio()" id="audio-btn">Play/Pause Rain</button>
 </div>
 
 <script>
