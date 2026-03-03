@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>worldclockWordPressEmbed-TEST</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a1a;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 8px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #7eb8f7;
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      opacity: 0.7;
+    }
+
+    .clocks {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+      max-width: 200px;
+    }
+
+    .clock-item {
+      background: linear-gradient(135deg, #0d1b2e, #112240);
+      border: 1px solid #1e3a5f;
+      border-radius: 8px;
+      padding: 7px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: border-color 0.3s;
+    }
+
+    .clock-item:hover {
+      border-color: #3a7bd5;
+    }
+
+    .city {
+      font-size: 11px;
+      color: #7eb8f7;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      min-width: 70px;
+    }
+
+    .time {
+      font-size: 15px;
+      color: #e8f4ff;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 1px;
+    }
+
+    .date-small {
+      font-size: 9px;
+      color: #4a7fa8;
+      text-align: right;
+      margin-top: 1px;
+    }
+
+    .right-side {
+      text-align: right;
+    }
+
+    .footer {
+      margin-top: 10px;
+      font-size: 9px;
+      color: #2a4a6a;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌍 worldclockWordPressEmbed-TEST</h1>
+
+  <div class="clocks" id="clocks"></div>
+
+  <div class="footer">auto-updating</div>
+
+  <script>
+    const zones = [
+      { city: "Čuprija",   tz: "Europe/Belgrade"    },
+      { city: "London",    tz: "Europe/London"       },
+      { city: "New York",  tz: "America/New_York"    },
+      { city: "Moscow",    tz: "Europe/Moscow"       },
+      { city: "Dubai",     tz: "Asia/Dubai"          },
+      { city: "Beijing",   tz: "Asia/Shanghai"       },
+      { city: "Tokyo",     tz: "Asia/Tokyo"          },
+      { city: "Sydney",    tz: "Australia/Sydney"    },
+    ];
+
+    const container = document.getElementById('clocks');
+
+    // Build DOM once
+    zones.forEach((z, i) => {
+      const item = document.createElement('div');
+      item.className = 'clock-item';
+      item.innerHTML = `
+        <span class="city">${z.city}</span>
+        <div class="right-side">
+          <div class="time" id="time-${i}">--:--:--</div>
+          <div class="date-small" id="date-${i}"></div>
+        </div>
+      `;
+      container.appendChild(item);
+    });
+
+    function update() {
+      const now = new Date();
+      zones.forEach((z, i) => {
+        const timeStr = now.toLocaleTimeString('en-GB', { timeZone: z.tz, hour12: false });
+        const dateStr = now.toLocaleDateString('en-GB', { timeZone: z.tz, weekday: 'short', month: 'short', day: 'numeric' });
+        document.getElementById(`time-${i}`).textContent = timeStr;
+        document.getElementById(`date-${i}`).textContent = dateStr;
+      });
+    }
+
+    update();
+    setInterval(update, 1000);
+  </script>
+
+</body>
+</html>
