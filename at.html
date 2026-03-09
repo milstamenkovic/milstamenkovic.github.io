@@ -1,4 +1,5 @@
 <!-- at.html -->
+<!-- 09.03.2026. - Ćuprija, Serbia -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,9 +7,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mil Stamenković @</title>
+  <link rel="icon" type="image/jpeg" href="/media/images/MilJapaneseSmallIconV1.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
     :root {
       --black:      #080808;
@@ -23,9 +26,11 @@
       --border:     #72000071;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    a { color: var(--accent-red); }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       background-color: var(--black);
@@ -362,15 +367,16 @@
     }
 
     /* ── Footer ── */
-    footer {
+    .footer {
       position: relative;
       z-index: 1;
       margin-top: 10px;
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--text-muted);
       opacity: 0.4;
+    }
+
+    .copyright {
+      color: var(--accent-red);
+      margin: 1em;
     }
 
   </style>
@@ -390,7 +396,7 @@
   <div class="avatar-wrap">
     <canvas class="avatar-canvas" id="borderCanvas"></canvas>
     <div class="avatar-inner">
-      <img src="/media/images/MilJapaneseAvatar-Transparent-1280x1280.png" alt="avatar">
+      <a href="https://milstamenkovic.github.io"><img src="/media/images/MilJapaneseAvatar-Transparent-1280x1280.png" alt="avatar"></a>
     </div>
   </div>
 
@@ -406,7 +412,7 @@
   <div class="group">
     <div class="group-label" data-i18n="group-contact">Contact</div>
 
-    <a class="link-btn primary" href="https://milproduction.wordpress.com/@">
+    <a class="link-btn primary" href="https://milproduction.wordpress.com/@" target="_blank">
       <span class="btn-icon"><i class="fa-regular fa-envelope"></i></span>
       <span class="btn-label" data-i18n="btn-email">Email</span>
       <span class="btn-sub">@</span>
@@ -429,7 +435,7 @@
       <span class="btn-sub">milproduction.wordpress.com</span>
     </a>
 
-    <a class="link-btn" href="https://imdb.com/name/yourpage" target="_blank" rel="noopener">
+    <a class="link-btn" href="https://www.imdb.com/name/nm5360693" target="_blank" rel="noopener">
       <span class="btn-icon"><i class="fa-brands fa-imdb"></i></span>
       <span class="btn-label">IMDb</span>
       <span class="btn-sub" data-i18n="btn-imdb-sub">Filmography</span>
@@ -479,7 +485,11 @@
 
 </div>
 
-<footer><a href="https://milstamenkovic.github.io">© 2026 Mil Stamenković</a></footer>
+<footer>
+  
+  <a class="copyright" href="https://milstamenkovic.github.io" target="_blank" data-i18n="copyright">© 2026 Mil Stamenković</a>
+
+</footer>
 
 <script>
   // ─────────────────────────────────────────────────────────────
@@ -500,6 +510,7 @@
       'btn-portfolio': 'Portfolio',
       'btn-imdb-sub':  'Filmography',
       'btn-video':     'Watch — Title of Your Video',
+      'copyright':     '© 2026 Mil Stamenković'
     },
     sr: {
       'name':          'Милан Стаменковић',
@@ -515,6 +526,7 @@
       'btn-portfolio': 'Радови',
       'btn-imdb-sub':  'Филмографија',
       'btn-video':     'Гледај',
+      'copyright':     '© 2026 Милан Стаменковић'
     }
   };
 
