@@ -1,0 +1,1010 @@
+<!-- Mil Photo 8bit -->
+<!-- Fun little photo manipulation PWA by Mil Stamenković -->
+<!-- Version A -->
+<!-- © 2026 Mil Stamenković -->
+<!-- Created with help of Claude AI -->
+<!-- Created: 06.03.2026. - Ćuprija, Serbia -->
+<!-- Revised: 06.03.2026. - Ćuprija, Serbia -->
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="description" content="Transform any photo into retro 8-bit pixel art" />
+  <title>PIXL — 8-Bit Photo Converter</title>
+  <link rel="manifest" href="#" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --bg: #0a0a0f;
+      --panel: #12121a;
+      --border: #2a2a3f;
+      --accent: #00ff88;
+      --accent2: #ff3c6e;
+      --accent3: #ffe600;
+      --accent4: #00cfff;
+      --text: #e8e8f0;
+      --dim: #6666aa;
+      --pixel: 4px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Scanline overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.15) 2px,
+        rgba(0,0,0,0.15) 4px
+      );
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* CRT glow corners */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    header {
+      padding: 2rem 2rem 1rem;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .logo {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      color: var(--accent);
+      text-shadow: 0 0 20px var(--accent), 4px 4px 0 rgba(0,255,136,0.2);
+      letter-spacing: 4px;
+    }
+
+    .logo span { color: var(--accent2); }
+
+    .tagline {
+      font-size: 0.65rem;
+      color: var(--dim);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .header-badge {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.4rem;
+      background: var(--accent2);
+      color: #000;
+      padding: 4px 8px;
+      letter-spacing: 1px;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 800px) {
+      main { grid-template-columns: 1fr; padding: 1rem; }
+    }
+
+    /* ---- LEFT PANEL ---- */
+    .left-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      background: var(--panel);
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(0,255,136,0.04);
+    }
+
+    .drop-zone canvas#sourceCanvas {
+      max-width: 100%;
+      max-height: 320px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .drop-icon {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 2.5rem;
+      color: var(--border);
+      margin-bottom: 1rem;
+      animation: blink 1.5s step-end infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .drop-text {
+      font-size: 0.7rem;
+      color: var(--dim);
+      text-align: center;
+      line-height: 2;
+    }
+
+    .drop-text strong { color: var(--accent); }
+
+    #fileInput { display: none; }
+
+    /* Filter grid */
+    .section-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.55rem;
+      color: var(--dim);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+
+    .filter-btn {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--dim);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.38rem;
+      padding: 0.7rem 0.3rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+      line-height: 1.8;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-btn .filter-icon {
+      display: block;
+      font-size: 1.2rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .filter-btn:hover { border-color: var(--accent4); color: var(--accent4); background: rgba(0,207,255,0.05); }
+    .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,255,136,0.08); box-shadow: 0 0 12px rgba(0,255,136,0.2); }
+
+    /* Sliders */
+    .controls { display: flex; flex-direction: column; gap: 0.8rem; }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .slider-label {
+      font-size: 0.6rem;
+      color: var(--dim);
+      min-width: 90px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .slider-row input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      background: var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .slider-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .slider-val {
+      font-size: 0.6rem;
+      color: var(--accent);
+      min-width: 32px;
+      text-align: right;
+    }
+
+    /* ---- RIGHT PANEL ---- */
+    .right-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .output-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      min-height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .output-box canvas#outputCanvas {
+      max-width: 100%;
+      max-height: 480px;
+      object-fit: contain;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .output-placeholder {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.5rem;
+      color: var(--border);
+      text-align: center;
+      line-height: 3;
+    }
+
+    .processing-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,15,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .processing-overlay.visible { display: flex; }
+
+    .pixel-spinner {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      animation: pixelSpin 0.6s steps(4) infinite;
+    }
+
+    @keyframes pixelSpin {
+      0%   { transform: rotate(0deg); background: var(--accent); }
+      25%  { transform: rotate(90deg); background: var(--accent2); }
+      50%  { transform: rotate(180deg); background: var(--accent3); }
+      75%  { transform: rotate(270deg); background: var(--accent4); }
+    }
+
+    .processing-text {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.45rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      animation: blink 0.8s step-end infinite;
+    }
+
+    /* Palette display */
+    .palette-row {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .palette-swatch {
+      width: 20px;
+      height: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
+    }
+
+    /* Buttons */
+    .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+    .btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.45rem;
+      padding: 0.8rem 1.2rem;
+      border: 2px solid;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+    }
+
+    .btn-primary:hover { background: transparent; color: var(--accent); box-shadow: 0 0 20px rgba(0,255,136,0.3); }
+
+    .btn-secondary {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--dim);
+    }
+
+    .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* Stats */
+    .stats-row {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .stat-label {
+      font-size: 0.5rem;
+      color: var(--dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.7rem;
+      color: var(--accent3);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.55rem;
+      color: var(--border);
+      border-top: 1px solid var(--border);
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">PIX<span>L</span></div>
+    <div class="tagline">8-bit photo transformer</div>
+  </div>
+  <div class="header-badge">PWA v1.0</div>
+</header>
+
+<main>
+  <!-- LEFT -->
+  <div class="left-panel">
+
+    <div>
+      <div class="section-title">Upload Image</div>
+      <div class="drop-zone" id="dropZone">
+        <canvas id="sourceCanvas" style="display:none"></canvas>
+        <div id="dropPlaceholder">
+          <div class="drop-icon">▣</div>
+          <div class="drop-text">
+            DROP IMAGE HERE<br>
+            <strong>or click to browse</strong><br>
+            PNG · JPG · WEBP · GIF
+          </div>
+        </div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" />
+    </div>
+
+    <div>
+      <div class="section-title">Effect Mode</div>
+      <div class="filter-grid">
+        <button class="filter-btn active" data-filter="pixel8">
+          <span class="filter-icon">🟩</span>8-BIT<br>CLASSIC
+        </button>
+        <button class="filter-btn" data-filter="gameboy">
+          <span class="filter-icon">🟢</span>GAME<br>BOY
+        </button>
+        <button class="filter-btn" data-filter="nes">
+          <span class="filter-icon">🔴</span>NES<br>PALETTE
+        </button>
+        <button class="filter-btn" data-filter="cga">
+          <span class="filter-icon">💜</span>CGA<br>MODE 4
+        </button>
+        <button class="filter-btn" data-filter="atari">
+          <span class="filter-icon">🟠</span>ATARI<br>2600
+        </button>
+        <button class="filter-btn" data-filter="matrix">
+          <span class="filter-icon">💚</span>MATRIX<br>CODE
+        </button>
+        <button class="filter-btn" data-filter="dither">
+          <span class="filter-icon">⬛</span>B&W<br>DITHER
+        </button>
+        <button class="filter-btn" data-filter="commodore">
+          <span class="filter-icon">🔵</span>C64<br>STYLE
+        </button>
+        <button class="filter-btn" data-filter="vaporwave">
+          <span class="filter-icon">🌸</span>VAPOR<br>WAVE
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Controls</div>
+      <div class="controls">
+        <div class="slider-row">
+          <span class="slider-label">Pixel Size</span>
+          <input type="range" id="pixelSize" min="2" max="24" value="6" />
+          <span class="slider-val" id="pixelSizeVal">6</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Colors</span>
+          <input type="range" id="colorCount" min="2" max="32" value="16" />
+          <span class="slider-val" id="colorCountVal">16</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Contrast</span>
+          <input type="range" id="contrast" min="-100" max="100" value="10" />
+          <span class="slider-val" id="contrastVal">10</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Saturation</span>
+          <input type="range" id="saturation" min="0" max="300" value="120" />
+          <span class="slider-val" id="saturationVal">120%</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+
+    <div>
+      <div class="section-title">Output Preview</div>
+      <div class="output-box" id="outputBox">
+        <div class="output-placeholder" id="outputPlaceholder">
+          AWAITING<br>INPUT<br>▣ ▣ ▣
+        </div>
+        <canvas id="outputCanvas" style="display:none"></canvas>
+        <div class="processing-overlay" id="processingOverlay">
+          <div class="pixel-spinner"></div>
+          <div class="processing-text">PROCESSING...</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Palette</div>
+      <div class="palette-row" id="paletteRow">
+        <span style="font-size:0.6rem;color:var(--dim)">Load an image to see palette</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Info</div>
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-label">Source</span>
+          <span class="stat-value" id="statSource">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Output</span>
+          <span class="stat-value" id="statOutput">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Pixels</span>
+          <span class="stat-value" id="statPixels">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="applyBtn" disabled>▶ APPLY</button>
+      <button class="btn btn-secondary" id="downloadBtn" disabled>⬇ SAVE PNG</button>
+      <button class="btn btn-secondary" id="resetBtn">✕ RESET</button>
+    </div>
+
+  </div>
+</main>
+
+<footer>PIXL © 2026 — PURE HTML · CSS · JS — NO SERVER NEEDED</footer>
+
+<!-- Hidden offscreen canvas for processing -->
+<canvas id="workCanvas" style="display:none"></canvas>
+
+<script>
+// ═══════════════════════════════════════════════
+//  PIXL — 8-bit Photo Converter
+//  Pure client-side canvas pixel manipulation
+// ═══════════════════════════════════════════════
+
+const dropZone    = document.getElementById('dropZone');
+const fileInput   = document.getElementById('fileInput');
+const srcCanvas   = document.getElementById('sourceCanvas');
+const outCanvas   = document.getElementById('outputCanvas');
+const workCanvas  = document.getElementById('workCanvas');
+const srcCtx      = srcCanvas.getContext('2d');
+const outCtx      = outCanvas.getContext('2d');
+const workCtx     = workCanvas.getContext('2d');
+
+const applyBtn    = document.getElementById('applyBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const resetBtn    = document.getElementById('resetBtn');
+const overlay     = document.getElementById('processingOverlay');
+
+let sourceImage   = null;
+let activeFilter  = 'pixel8';
+
+// ── Palettes ──────────────────────────────────
+
+const PALETTES = {
+  pixel8: null, // dynamic quantization
+
+  gameboy: [
+    [15,56,15],[48,98,48],[139,172,15],[155,188,15]
+  ],
+
+  nes: [
+    [0,0,0],[252,252,252],[248,0,0],[0,168,0],
+    [0,0,252],[252,164,0],[96,0,120],[0,232,216],
+    [252,188,176],[0,88,0],[168,0,32],[104,136,252],
+    [252,252,0],[188,188,188],[0,0,0],[248,216,120]
+  ],
+
+  cga: [
+    [0,0,0],[255,85,255],[85,255,255],[255,255,255]
+  ],
+
+  atari: [
+    [0,0,0],[68,68,68],[136,136,136],[255,255,255],
+    [255,0,0],[0,255,0],[0,0,255],[255,255,0],
+    [255,128,0],[0,255,255],[255,0,255],[128,0,0],
+    [0,128,0],[0,0,128],[128,128,0],[0,128,128]
+  ],
+
+  matrix: [
+    [0,0,0],[0,30,0],[0,70,0],[0,120,0],
+    [0,180,0],[0,255,0],[100,255,100],[200,255,200]
+  ],
+
+  dither: null, // B&W
+
+  commodore: [
+    [0,0,0],[255,255,255],[136,0,0],[170,255,238],
+    [204,68,204],[0,204,85],[0,0,170],[238,238,119],
+    [221,136,85],[102,68,0],[255,119,119],[51,51,51],
+    [119,119,119],[170,255,102],[0,136,255],[187,187,187]
+  ],
+
+  vaporwave: [
+    [10,0,30],[255,0,128],[0,255,255],[255,0,255],
+    [100,0,200],[255,200,255],[0,200,255],[20,20,60],
+    [255,100,200],[150,0,255],[50,255,200],[255,255,100]
+  ]
+};
+
+// ── Drag & Drop ───────────────────────────────
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadImage(file);
+});
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) loadImage(e.target.files[0]);
+});
+
+// ── Load Image ────────────────────────────────
+
+function loadImage(file) {
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    sourceImage = img;
+    // Show thumbnail
+    const maxW = dropZone.clientWidth - 4;
+    const maxH = 300;
+    const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+    srcCanvas.width  = Math.round(img.width  * scale);
+    srcCanvas.height = Math.round(img.height * scale);
+    srcCtx.drawImage(img, 0, 0, srcCanvas.width, srcCanvas.height);
+    document.getElementById('dropPlaceholder').style.display = 'none';
+    srcCanvas.style.display = 'block';
+
+    document.getElementById('statSource').textContent = `${img.width}×${img.height}`;
+    applyBtn.disabled = false;
+    URL.revokeObjectURL(url);
+
+    // Auto-apply
+    applyFilter();
+  };
+  img.src = url;
+}
+
+// ── Filter Buttons ────────────────────────────
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    if (sourceImage) applyFilter();
+  });
+});
+
+// ── Slider updates ────────────────────────────
+
+['pixelSize','colorCount','contrast','saturation'].forEach(id => {
+  const el = document.getElementById(id);
+  const val = document.getElementById(id + 'Val');
+  el.addEventListener('input', () => {
+    val.textContent = id === 'saturation' ? el.value + '%' : el.value;
+    if (sourceImage) applyFilter();
+  });
+});
+
+// ── Buttons ───────────────────────────────────
+
+applyBtn.addEventListener('click', applyFilter);
+
+downloadBtn.addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = `pixl-${activeFilter}.png`;
+  link.href = outCanvas.toDataURL('image/png');
+  link.click();
+});
+
+resetBtn.addEventListener('click', () => {
+  sourceImage = null;
+  srcCanvas.style.display = 'none';
+  document.getElementById('dropPlaceholder').style.display = '';
+  outCanvas.style.display = 'none';
+  document.getElementById('outputPlaceholder').style.display = '';
+  document.getElementById('paletteRow').innerHTML = '<span style="font-size:0.6rem;color:var(--dim)">Load an image to see palette</span>';
+  document.getElementById('statSource').textContent = '—';
+  document.getElementById('statOutput').textContent = '—';
+  document.getElementById('statPixels').textContent = '—';
+  applyBtn.disabled = true;
+  downloadBtn.disabled = true;
+  fileInput.value = '';
+});
+
+// ── Main Apply ────────────────────────────────
+
+function applyFilter() {
+  if (!sourceImage) return;
+
+  overlay.classList.add('visible');
+
+  // Defer so UI updates first
+  setTimeout(() => {
+    const pixelSize  = parseInt(document.getElementById('pixelSize').value);
+    const colorCount = parseInt(document.getElementById('colorCount').value);
+    const contrast   = parseInt(document.getElementById('contrast').value);
+    const saturation = parseInt(document.getElementById('saturation').value) / 100;
+
+    // Work at reduced resolution
+    const w = Math.floor(sourceImage.width  / pixelSize);
+    const h = Math.floor(sourceImage.height / pixelSize);
+
+    workCanvas.width  = w;
+    workCanvas.height = h;
+    workCtx.drawImage(sourceImage, 0, 0, w, h);
+
+    let imageData = workCtx.getImageData(0, 0, w, h);
+    let data = imageData.data;
+
+    // Apply contrast & saturation
+    applyContrast(data, contrast);
+    applySaturation(data, saturation);
+
+    // Apply palette / dithering based on filter
+    switch (activeFilter) {
+      case 'pixel8':    quantize(data, colorCount); break;
+      case 'gameboy':   applyPalette(data, PALETTES.gameboy); break;
+      case 'nes':       applyPalette(data, PALETTES.nes); break;
+      case 'cga':       applyPalette(data, PALETTES.cga); break;
+      case 'atari':     applyPalette(data, PALETTES.atari); break;
+      case 'matrix':    applyMatrix(data); break;
+      case 'dither':    applyDither(data, w, h); break;
+      case 'commodore': applyPalette(data, PALETTES.commodore); break;
+      case 'vaporwave': applyVaporwave(data); break;
+    }
+
+    workCtx.putImageData(imageData, 0, 0);
+
+    // Scale up pixelated to output
+    const outW = w * pixelSize;
+    const outH = h * pixelSize;
+    outCanvas.width  = outW;
+    outCanvas.height = outH;
+    outCtx.imageSmoothingEnabled = false;
+    outCtx.drawImage(workCanvas, 0, 0, outW, outH);
+
+    // Show output
+    outCanvas.style.display = 'block';
+    document.getElementById('outputPlaceholder').style.display = 'none';
+    downloadBtn.disabled = false;
+
+    document.getElementById('statOutput').textContent = `${outW}×${outH}`;
+    document.getElementById('statPixels').textContent = `${(w * h).toLocaleString()}`;
+
+    // Show palette
+    showPalette(data);
+
+    overlay.classList.remove('visible');
+  }, 30);
+}
+
+// ── Image Processing Functions ────────────────
+
+function applyContrast(data, amount) {
+  const factor = (259 * (amount + 255)) / (255 * (259 - amount));
+  for (let i = 0; i < data.length; i += 4) {
+    data[i]   = clamp(factor * (data[i]   - 128) + 128);
+    data[i+1] = clamp(factor * (data[i+1] - 128) + 128);
+    data[i+2] = clamp(factor * (data[i+2] - 128) + 128);
+  }
+}
+
+function applySaturation(data, amount) {
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+    const gray = 0.299*r + 0.587*g + 0.114*b;
+    data[i]   = clamp(gray + (r - gray) * amount);
+    data[i+1] = clamp(gray + (g - gray) * amount);
+    data[i+2] = clamp(gray + (b - gray) * amount);
+  }
+}
+
+// Nearest-color palette mapping
+function applyPalette(data, palette) {
+  for (let i = 0; i < data.length; i += 4) {
+    const c = nearestColor(data[i], data[i+1], data[i+2], palette);
+    data[i] = c[0]; data[i+1] = c[1]; data[i+2] = c[2];
+  }
+}
+
+function nearestColor(r, g, b, palette) {
+  let best = palette[0], bestDist = Infinity;
+  for (const c of palette) {
+    const dr = r-c[0], dg = g-c[1], db = b-c[2];
+    const d = dr*dr + dg*dg + db*db;
+    if (d < bestDist) { bestDist = d; best = c; }
+  }
+  return best;
+}
+
+// Simple median-cut quantization
+function quantize(data, numColors) {
+  const pixels = [];
+  for (let i = 0; i < data.length; i += 4)
+    pixels.push([data[i], data[i+1], data[i+2]]);
+
+  const palette = medianCut(pixels, numColors);
+  applyPalette(data, palette);
+}
+
+function medianCut(pixels, count) {
+  // Simple k-means-like reduction for speed
+  // Start with a subset of pixels for speed
+  const step = Math.max(1, Math.floor(pixels.length / 2000));
+  const sample = pixels.filter((_, i) => i % step === 0);
+
+  let buckets = [sample];
+
+  while (buckets.length < count) {
+    // Find largest bucket
+    let largestIdx = 0, largestRange = 0;
+    for (let i = 0; i < buckets.length; i++) {
+      const r = channelRange(buckets[i]);
+      if (r > largestRange) { largestRange = r; largestIdx = i; }
+    }
+    const bucket = buckets.splice(largestIdx, 1)[0];
+    const [b1, b2] = splitBucket(bucket);
+    buckets.push(b1, b2);
+    if (buckets.length >= count) break;
+  }
+
+  return buckets.map(bucket => {
+    let r=0,g=0,b=0;
+    for (const p of bucket) { r+=p[0]; g+=p[1]; b+=p[2]; }
+    const n = bucket.length || 1;
+    return [Math.round(r/n), Math.round(g/n), Math.round(b/n)];
+  });
+}
+
+function channelRange(pixels) {
+  let rMin=255,rMax=0,gMin=255,gMax=0,bMin=255,bMax=0;
+  for (const p of pixels) {
+    if(p[0]<rMin)rMin=p[0]; if(p[0]>rMax)rMax=p[0];
+    if(p[1]<gMin)gMin=p[1]; if(p[1]>gMax)gMax=p[1];
+    if(p[2]<bMin)bMin=p[2]; if(p[2]>bMax)bMax=p[2];
+  }
+  return Math.max(rMax-rMin, gMax-gMin, bMax-bMin);
+}
+
+function splitBucket(pixels) {
+  let rMin=255,rMax=0,gMin=255,gMax=0,bMin=255,bMax=0;
+  for (const p of pixels) {
+    if(p[0]<rMin)rMin=p[0]; if(p[0]>rMax)rMax=p[0];
+    if(p[1]<gMin)gMin=p[1]; if(p[1]>gMax)gMax=p[1];
+    if(p[2]<bMin)bMin=p[2]; if(p[2]>bMax)bMax=p[2];
+  }
+  const rR=rMax-rMin, gR=gMax-gMin, bR=bMax-bMin;
+  const ch = rR>gR && rR>bR ? 0 : gR>bR ? 1 : 2;
+  pixels.sort((a,b) => a[ch]-b[ch]);
+  const mid = Math.floor(pixels.length/2);
+  return [pixels.slice(0,mid), pixels.slice(mid)];
+}
+
+// Matrix / green monochrome
+function applyMatrix(data) {
+  for (let i = 0; i < data.length; i += 4) {
+    const lum = 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
+    const level = Math.round(lum / 255 * 7) / 7;
+    data[i]   = 0;
+    data[i+1] = Math.round(255 * level);
+    data[i+2] = Math.round(40 * level);
+  }
+}
+
+// Floyd-Steinberg dithering (B&W)
+function applyDither(data, w, h) {
+  const gray = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++)
+    gray[i] = 0.299*data[i*4] + 0.587*data[i*4+1] + 0.114*data[i*4+2];
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const idx = y*w + x;
+      const old = gray[idx];
+      const nw = old < 128 ? 0 : 255;
+      gray[idx] = nw;
+      const err = old - nw;
+      if (x+1 < w)          gray[idx+1]   += err * 7/16;
+      if (y+1 < h) {
+        if (x > 0)           gray[idx+w-1] += err * 3/16;
+                             gray[idx+w]   += err * 5/16;
+        if (x+1 < w)         gray[idx+w+1] += err * 1/16;
+      }
+    }
+  }
+
+  for (let i = 0; i < w * h; i++) {
+    const v = clamp(gray[i]);
+    data[i*4] = data[i*4+1] = data[i*4+2] = v;
+  }
+}
+
+// Vaporwave — shift hues to pink/purple/teal
+function applyVaporwave(data) {
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+    const lum = 0.299*r + 0.587*g + 0.114*b;
+    // Mix original with vaporwave tones
+    data[i]   = clamp(lum * 0.4 + r * 0.3 + 180 * 0.3);
+    data[i+1] = clamp(lum * 0.1 + g * 0.1 + 0   * 0.8);
+    data[i+2] = clamp(lum * 0.3 + b * 0.5 + 200 * 0.2);
+    // Then snap to palette
+  }
+  applyPalette(data, PALETTES.vaporwave);
+}
+
+// ── Palette Display ───────────────────────────
+
+function showPalette(data) {
+  const colorMap = new Map();
+  for (let i = 0; i < data.length; i += 4) {
+    const key = `${data[i]},${data[i+1]},${data[i+2]}`;
+    colorMap.set(key, (colorMap.get(key) || 0) + 1);
+  }
+  const sorted = [...colorMap.entries()].sort((a,b) => b[1]-a[1]).slice(0,32);
+  const row = document.getElementById('paletteRow');
+  row.innerHTML = '';
+  for (const [key] of sorted) {
+    const sw = document.createElement('div');
+    sw.className = 'palette-swatch';
+    sw.style.background = `rgb(${key})`;
+    sw.title = `#${key.split(',').map(v=>parseInt(v).toString(16).padStart(2,'0')).join('')}`;
+    row.appendChild(sw);
+  }
+}
+
+// ── Utilities ─────────────────────────────────
+
+function clamp(v) { return Math.max(0, Math.min(255, Math.round(v))); }
+
+// ── PWA: Service Worker inline ────────────────
+
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'pixl-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+// ── Manifest inline (PWA installable) ─────────
+
+const manifest = {
+  name: "PIXL — 8-Bit Photo Converter",
+  short_name: "PIXL",
+  description: "Transform any photo into retro 8-bit pixel art",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#0a0a0f",
+  theme_color: "#00ff88",
+  icons: []
+};
+
+const mBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+const mUrl  = URL.createObjectURL(mBlob);
+const mLink = document.createElement('link');
+mLink.rel = 'manifest';
+mLink.href = mUrl;
+document.head.appendChild(mLink);
+</script>
+</body>
+</html>
