@@ -1,4 +1,4 @@
-<!-- Version A -->
+<!-- Version B -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,6 +8,7 @@
   <title>Mil Stamenković @</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root {
       --black:      #080808;
@@ -59,6 +60,46 @@
       z-index: 0;
     }
 
+    /* ── Language Toggle ── */
+    .lang-toggle {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .lang-btn.active {
+      background: var(--deep-red);
+      color: var(--gold-light);
+    }
+
+    .lang-btn:hover:not(.active) {
+      color: var(--accent-red);
+    }
+
+    .lang-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+
     .container {
       position: relative;
       z-index: 1;
@@ -84,7 +125,6 @@
       margin-bottom: 28px;
     }
 
-    /* Canvas sits outside the image as the animated border */
     .avatar-canvas {
       position: absolute;
       inset: -8px;
@@ -100,7 +140,6 @@
       height: 100%;
       border-radius: 0%;
       overflow: hidden;
-      mix-blend-mode: screen;
       z-index: 1;
     }
 
@@ -111,19 +150,6 @@
       display: block;
     }
 
-    .avatar-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Cinzel', serif;
-      font-size: 32px;
-      color: var(--gold);
-      letter-spacing: 2px;
-      background: radial-gradient(circle at 40% 35%, #1e0a0a, #080808);
-    }
-
     /* ── Name & Bio ── */
     .name {
       font-size: clamp(1.4rem, 5vw, 1.9rem);
@@ -132,6 +158,7 @@
       color: var(--deep-red);
       text-align: center;
       line-height: 1.2;
+      text-transform: uppercase;
     }
 
     .title-line {
@@ -153,14 +180,13 @@
     }
 
     .bio {
-      font-size: 1rem;
+      font-size: 1em;
       font-weight: 300;
       font-style: italic;
       line-height: 1.7;
       text-align: center;
       color: var(--text-muted);
       max-width: 360px;
-      margin-bottom: 40px;
     }
 
     /* ── Link Groups ── */
@@ -229,12 +255,17 @@
       height: 18px;
       flex-shrink: 0;
       opacity: 0.7;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: opacity 0.2s;
     }
 
     .link-btn:hover .btn-icon { opacity: 1; }
 
     .btn-label { flex: 1; }
+
     .btn-sub {
       font-size: 0.75rem;
       color: var(--text-muted);
@@ -256,96 +287,85 @@
 </head>
 <body>
 
+<!-- Language Toggle -->
+<div class="lang-toggle">
+  <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+  <div class="lang-divider"></div>
+  <button class="lang-btn" id="btn-sr" onclick="setLang('sr')">СР</button>
+</div>
+
 <div class="container">
 
   <!-- Avatar -->
   <div class="avatar-wrap">
     <canvas class="avatar-canvas" id="borderCanvas"></canvas>
     <div class="avatar-inner">
-      <img src="./media/images/Mil ミラノ -- Avatar v02 Medium PNG.png" alt="avatar">
+      <img src="./media/images/MilJapaneseAvatar-Transparent-1280x1280.png" alt="avatar">
     </div>
   </div>
 
   <!-- Name & Title -->
-  <div class="name">Mil Stamenković @</div>
-  <div class="title-line">Contacts</div>
+  <div class="name" data-i18n="name">Mil Stamenković</div>
+  <div class="title-line" data-i18n="title">Contacts</div>
 
   <div class="divider"></div>
 
-  <p class="bio">
-    Mil Stamenković / Милан Стаменковић
-  </p>
+  <p class="bio"><span data-i18n="country">Serbia</span> / <span data-i18n="nationality">Serbian</span></p>
 
   <!-- Contact -->
   <div class="group">
-    <div class="group-label">Contact</div>
+    <div class="group-label" data-i18n="group-contact">Contact</div>
 
-    <a class="link-btn primary" href="mailto:you@email.com">
-      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/>
-      </svg>
-      <span class="btn-label">Email</span>
-      <span class="btn-sub">you@email.com</span>
-    </a>
-  </div>
-
-  <!-- Social -->
-  <div class="group">
-    <div class="group-label">Social</div>
-
-    <a class="link-btn" href="https://instagram.com/yourhandle" target="_blank" rel="noopener">
-      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
-      </svg>
-      <span class="btn-label">Instagram</span>
-      <span class="btn-sub">@yourhandle</span>
+    <a class="link-btn primary" href="https://milproduction.wordpress.com/@">
+      <span class="btn-icon"><i class="fa-regular fa-envelope"></i></span>
+      <span class="btn-label" data-i18n="btn-email">Email</span>
+      <span class="btn-sub">@</span>
     </a>
 
-    <a class="link-btn" href="https://vimeo.com/yourhandle" target="_blank" rel="noopener">
-      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M21 7.5c-.2 4-2.8 9.5-7.8 16.5C8.2 17.5 5 12 4.5 8c-.5-4 2-6 4.5-6 2 0 3.5 1.5 4 4.5.5-3 2-4.5 4-4.5s3.2 1.5 4 5.5z"/>
-      </svg>
-      <span class="btn-label">Vimeo</span>
-      <span class="btn-sub">@yourhandle</span>
-    </a>
-
-    <a class="link-btn" href="https://youtube.com/@yourhandle" target="_blank" rel="noopener">
-      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M22 8s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C15.6 3.7 12 3.7 12 3.7s-3.6 0-5.8.2c-.6.1-1.9.1-3 1.3C2.3 6 2 8 2 8S1.7 10.3 1.7 12.5v2.1c0 2.2.3 4.4.3 4.4s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C8.5 23.2 12 23.2 12 23.2s3.6 0 5.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.2.3-4.4v-2.1C22.3 10.3 22 8 22 8z"/>
-        <polygon points="9.5,15.5 9.5,8.5 16,12" fill="currentColor" stroke="none"/>
-      </svg>
-      <span class="btn-label">YouTube</span>
-      <span class="btn-sub">@yourhandle</span>
+    <a class="link-btn" href="https://milstamenkovic.github.io" target="_blank" rel="noopener">
+      <span class="btn-icon"><i class="fa-solid fa-globe"></i></span>
+      <span class="btn-label" data-i18n="btn-website">Website</span>
+      <span class="btn-sub">milstamenkovic.github.io</span>
     </a>
   </div>
 
   <!-- Work -->
   <div class="group">
-    <div class="group-label">Work</div>
+    <div class="group-label" data-i18n="group-work">Work</div>
 
-    <a class="link-btn" href="https://yourportfolio.com" target="_blank" rel="noopener">
-      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="2" y="5" width="20" height="15" rx="2"/><path d="M16 2H8l-1 3h10l-1-3z"/>
-      </svg>
-      <span class="btn-label">Portfolio</span>
-      <span class="btn-sub">yourportfolio.com</span>
+    <a class="link-btn" href="https://milproduction.wordpress.com" target="_blank" rel="noopener">
+      <span class="btn-icon"><i class="fa-solid fa-briefcase"></i></span>
+      <span class="btn-label" data-i18n="btn-portfolio">Portfolio</span>
+      <span class="btn-sub">milproduction.wordpress.com</span>
     </a>
 
     <a class="link-btn" href="https://imdb.com/name/yourpage" target="_blank" rel="noopener">
-      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="2" y="6" width="20" height="13" rx="2"/>
-        <text x="4.5" y="16" font-size="7" fill="currentColor" stroke="none" font-family="monospace" font-weight="bold">IMDb</text>
-      </svg>
+      <span class="btn-icon"><i class="fa-brands fa-imdb"></i></span>
       <span class="btn-label">IMDb</span>
-      <span class="btn-sub">Filmography</span>
+      <span class="btn-sub" data-i18n="btn-imdb-sub">Filmography</span>
+    </a>
+  </div>
+
+  <!-- Social -->
+  <div class="group">
+    <div class="group-label" data-i18n="group-social">Social</div>
+
+    <a class="link-btn" href="https://twitter.com/milstamenkovic" target="_blank" rel="noopener">
+      <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span>
+      <span class="btn-label">Twitter / X</span>
+      <span class="btn-sub">@milstamenkovic</span>
     </a>
 
-    <a class="link-btn" href="https://yourwebsite.com" target="_blank" rel="noopener">
-      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-      </svg>
-      <span class="btn-label">Website</span>
-      <span class="btn-sub">yourwebsite.com</span>
+    <a class="link-btn" href="https://youtube.com/@milstamenkovic" target="_blank" rel="noopener">
+      <span class="btn-icon"><i class="fa-brands fa-youtube"></i></span>
+      <span class="btn-label">YouTube</span>
+      <span class="btn-sub">@milstamenkovic</span>
+    </a>
+
+    <a class="link-btn" href="https://instagram.com/milstamenkovic" target="_blank" rel="noopener">
+      <span class="btn-icon"><i class="fa-brands fa-instagram"></i></span>
+      <span class="btn-label">Instagram</span>
+      <span class="btn-sub">@milstamenkovic</span>
     </a>
   </div>
 
@@ -354,34 +374,80 @@
 <footer><a href="https://milstamenkovic.github.io">© 2026 Mil Stamenković</a></footer>
 
 <script>
+  // ─────────────────────────────────────────────────────────────
+  // TRANSLATIONS
+  // Fill in the 'sr' values with your Serbian translations.
+  // The 'en' values are the originals — do not change those.
+  // ─────────────────────────────────────────────────────────────
+  const i18n = {
+    en: {
+      'title':         'Contacts',
+      'country':       'Serbia',
+      'name':          'Mil Stamenković',
+      'nationality':   'Serbian',
+      'group-contact': 'Contact',
+      'group-work':    'Work',
+      'group-social':  'Social',
+      'btn-email':     'Email',
+      'btn-website':   'Website',
+      'btn-portfolio': 'Portfolio',
+      'btn-imdb-sub':  'Filmography',
+    },
+    sr: {
+      'title':         'Контакти',
+      'name':          'Милан Стаменковић',
+      'country':       'Србија',
+      'nationality':   'Србијанац',
+      'group-contact': 'Контакти',
+      'group-work':    'Посао',
+      'group-social':  'Друштвене мреже',
+      'btn-email':     'Имејл',
+      'btn-website':   'Вебсајт',
+      'btn-portfolio': 'Радови',
+      'btn-imdb-sub':  'Филмографија',
+    }
+  };
+
+  function setLang(lang) {
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.getElementById('btn-sr').classList.toggle('active', lang === 'sr');
+    document.documentElement.lang = lang === 'sr' ? 'sr' : 'en';
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (i18n[lang][key] !== undefined) el.textContent = i18n[lang][key];
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // CANVAS BORDER ANIMATION
+  // ─────────────────────────────────────────────────────────────
   const canvas = document.getElementById('borderCanvas');
   const ctx    = canvas.getContext('2d');
 
-  // Size the canvas to its actual CSS dimensions, retina-aware
   function initCanvas() {
     const dpr  = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
     canvas.width  = rect.width  * dpr;
     canvas.height = rect.height * dpr;
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // reset before rescaling
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
     return { W: rect.width, H: rect.height };
   }
 
   let { W, H } = initCanvas();
 
-  const BORDER_W   = 1.5;   // width of the static dim border
-  const TAIL_PX    = 60;    // length of the glowing tail in px
-  const SPEED_PX   = 110;   // px per second around perimeter
+  const BORDER_W = 1.5;
+  const TAIL_PX  = 60;
+  const SPEED_PX = 110;
 
-  // Returns {x, y} for a distance d (px) clockwise from top-left corner
   function posAt(d, w, h) {
     const p = 2 * (w + h);
     d = ((d % p) + p) % p;
-    if (d <= w)           return { x: d,             y: 0             };
-    if (d <= w + h)       return { x: w,             y: d - w         };
-    if (d <= 2 * w + h)   return { x: w - (d-w-h),   y: h             };
-                          return { x: 0,             y: h - (d-2*w-h) };
+    if (d <= w)         return { x: d,         y: 0           };
+    if (d <= w + h)     return { x: w,         y: d - w       };
+    if (d <= 2*w + h)   return { x: w-(d-w-h), y: h           };
+                        return { x: 0,         y: h-(d-2*w-h) };
   }
 
   let dist = 0;
@@ -401,32 +467,27 @@
 
     ctx.clearRect(0, 0, w, h);
 
-    // ── Fixed dim border ──
     ctx.strokeStyle = 'rgba(255,255,255,0.10)';
     ctx.lineWidth   = BORDER_W;
     ctx.strokeRect(off, off, w - BORDER_W, h - BORDER_W);
 
-    // ── Glowing tail ── (back to front so head renders last / on top)
     const STEPS = 72;
     for (let i = 0; i < STEPS; i++) {
       const t0 = i / STEPS;
       const t1 = (i + 1) / STEPS;
-
       const p0 = posAt(dist - TAIL_PX * (1 - t0), w, h);
       const p1 = posAt(dist - TAIL_PX * (1 - t1), w, h);
-
       const alpha = Math.pow(t0, 1.8);
 
-      // colour: dark gold ember → deep red → bright crimson at head
       let r, g, b;
       if (t0 < 0.35) {
         r = 110; g = 55; b = 8;
       } else if (t0 < 0.70) {
         const f = (t0 - 0.35) / 0.35;
-        r = 110 + f * 60; g = 15; b = 8;
+        r = 110 + f*60; g = 15; b = 8;
       } else {
         const f = (t0 - 0.70) / 0.30;
-        r = 170 + f * 85; g = 15 + f * 25; b = 8 + f * 12;
+        r = 170 + f*85; g = 15 + f*25; b = 8 + f*12;
       }
 
       ctx.beginPath();
@@ -438,7 +499,6 @@
       ctx.stroke();
     }
 
-    // ── Head: bright radial glow ──
     const head = posAt(dist, w, h);
     const grd  = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 7);
     grd.addColorStop(0,    'rgba(255, 90, 50, 1)');
