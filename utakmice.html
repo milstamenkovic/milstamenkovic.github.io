@@ -17,7 +17,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Утакмицеt</title>
+    <title>Утакмице</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -68,7 +68,7 @@
         let matchData = [];
         let timerInterval = null;
 
-        // Formats date into "HH:MM DD/MM/YYYY" (e.g., 20:45 14/04/2026)
+        // Formats date into "HH:MMh DD.MM.YYYY." (e.g., 20:45h 14.04.2026.)
         function formatDateTime(dateObj) {
             const d = dateObj.getDate().toString().padStart(2, '0');
             const m = (dateObj.getMonth() + 1).toString().padStart(2, '0');
