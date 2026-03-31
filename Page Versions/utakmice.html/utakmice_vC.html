@@ -1,0 +1,229 @@
+<!-- Version C -->
+<!-- Free Gemini AI -->
+<!-- 17h46'18'' - 31.03.2026. - Ćuprija, Serbia - Mil Stamenković -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Game Countdown Widget</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .timer-glow {
+            text-shadow: 0 0 8px rgba(34, 211, 238, 0.5); /* Cyan glow */
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 font-sans antialiased">
+
+    <div class="bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-3xl relative overflow-hidden">
+        
+        <div class="flex items-center justify-between mb-6 border-b border-slate-700/50 pb-4">
+            <h2 class="text-xs font-bold tracking-[0.2em] text-slate-400 uppercase flex items-center gap-2">
+                Upcoming Fixtures
+            </h2>
+            <div id="refresh-indicator" class="flex items-center gap-2 text-[10px] text-slate-500 uppercase tracking-wider">
+                <span id="status-text">Syncing</span>
+                <div id="status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
+            </div>
+        </div>
+        
+        <div id="matches-container" class="space-y-2">
+            <!-- Loading Skeleton -->
+            <div class="animate-pulse space-y-4 py-2">
+                <div class="h-12 bg-slate-700/50 rounded-lg w-full"></div>
+                <div class="h-12 bg-slate-700/50 rounded-lg w-full"></div>
+                <div class="h-12 bg-slate-700/50 rounded-lg w-full"></div>
+                <div class="h-12 bg-slate-700/50 rounded-lg w-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Priorities applied for the tie-breaker sorting rule
+        const targetTeams = [
+            { id: '111', fallbackName: 'FC Juventus', priority: 1 },
+            { id: '364', fallbackName: 'FC Liverpool', priority: 2 },
+            { id: '360', fallbackName: 'FC Manchester United', priority: 3 },
+            { id: '382', fallbackName: 'FC Manchester City', priority: 4 }
+        ];
+
+        let matchData = [];
+        let timerInterval = null;
+
+        // Formats date into "HH:MM DD/MM/YYYY" (e.g., 20:45 14/04/2026)
+        function formatDateTime(dateObj) {
+            const d = dateObj.getDate().toString().padStart(2, '0');
+            const m = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+            const y = dateObj.getFullYear();
+            const hh = dateObj.getHours().toString().padStart(2, '0');
+            const mm = dateObj.getMinutes().toString().padStart(2, '0');
+            return `${hh}:${mm} ${d}/${m}/${y}`;
+        }
+
+        async function fetchWithRetry(url, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(url);
+                    if (res.ok) return await res.json();
+                } catch (e) {
+                    if (i === retries - 1) throw e;
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+
+        async function fetchSchedules() {
+            const statusText = document.getElementById('status-text');
+            const statusDot = document.getElementById('status-dot');
+            statusText.innerText = 'Syncing...';
+            statusDot.className = 'w-2 h-2 rounded-full bg-amber-500 animate-pulse';
+            
+            const newMatchData = [];
+            
+            for (const team of targetTeams) {
+                try {
+                    const data = await fetchWithRetry(`https://site.api.espn.com/apis/site/v2/sports/soccer/all/teams/${team.id}`);
+                    
+                    if (data && data.team && data.team.nextEvent) {
+                        const event = data.team.nextEvent[0];
+                        const date = new Date(event.date);
+                        
+                        const competition = event.competitions[0];
+                        const competitors = competition.competitors;
+                        const homeComp = competitors.find(c => c.homeAway === 'home');
+                        const awayComp = competitors.find(c => c.homeAway === 'away');
+
+                        newMatchData.push({
+                            id: team.id,
+                            priority: team.priority,
+                            home: homeComp?.team?.shortDisplayName || homeComp?.team?.name || 'TBD',
+                            away: awayComp?.team?.shortDisplayName || awayComp?.team?.name || 'TBD',
+                            date: date
+                        });
+                    } else {
+                        newMatchData.push({
+                            id: team.id,
+                            priority: team.priority,
+                            error: 'Fixture TBD',
+                            fallback: team.fallbackName
+                        });
+                    }
+                } catch (e) {
+                    newMatchData.push({
+                        id: team.id,
+                        priority: team.priority,
+                        error: 'Service Offline',
+                        fallback: team.fallbackName
+                    });
+                }
+            }
+            
+            // --- SORTING LOGIC ---
+            newMatchData.sort((a, b) => {
+                // If one has an error (TBD/Offline), push it to the bottom
+                if (a.error && !b.error) return 1;
+                if (!a.error && b.error) return -1;
+                
+                // If both have errors, sort by user's priority order
+                if (a.error && b.error) return a.priority - b.priority;
+
+                // Sort by date/time (closest game first)
+                const timeDiff = a.date.getTime() - b.date.getTime();
+                
+                // If games are at the exact same time, use tie-breaker priority
+                if (timeDiff === 0) {
+                    return a.priority - b.priority;
+                }
+                
+                return timeDiff;
+            });
+
+            matchData = newMatchData;
+            renderMatches();
+            statusText.innerText = 'Live';
+            statusDot.className = 'w-2 h-2 rounded-full bg-cyan-500 animate-pulse';
+        }
+
+        function renderMatches() {
+            const container = document.getElementById('matches-container');
+            container.innerHTML = ''; 
+            
+            matchData.forEach((match, index) => {
+                const row = document.createElement('div');
+                row.className = `flex flex-col md:flex-row md:items-center md:justify-between p-3 rounded-lg transition-colors hover:bg-slate-700/30 gap-2 md:gap-4 border-b border-slate-700/30 w-full`;
+                
+                if (match.error) {
+                    row.innerHTML = `
+                        <div class="text-slate-300 font-medium flex-1">${match.fallback}</div>
+                        <div class="mt-1 md:mt-0">
+                            <span class="text-slate-500 text-xs font-mono bg-slate-700/50 px-3 py-1 rounded-md uppercase tracking-tighter">${match.error}</span>
+                        </div>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <!-- Game Details -->
+                        <div class="text-slate-200 font-medium tracking-wide text-[15px] flex-1 truncate mb-1 md:mb-0 md:pr-4">
+                            ${match.home} <span class="text-slate-500 mx-1">:</span> ${match.away}
+                        </div>
+                        
+                        <!-- Time and Date -->
+                        <div class="text-slate-400 font-mono text-sm whitespace-nowrap shrink-0 md:w-36 md:text-left mb-2 md:mb-0">
+                            ${formatDateTime(match.date)}
+                        </div>
+                        
+                        <!-- Countdown -->
+                        <div class="flex items-center shrink-0 md:w-36 md:justify-end">
+                            <span class="timer font-mono text-cyan-400 bg-cyan-400/10 px-3 py-1.5 rounded-md text-sm timer-glow tracking-widest font-semibold min-w-[125px] text-center" id="timer-${match.id}">
+                                0D 0h 0'
+                            </span>
+                        </div>
+                    `;
+                }
+                container.appendChild(row);
+            });
+            
+            if (timerInterval) clearInterval(timerInterval);
+            updateCountdowns();
+            timerInterval = setInterval(updateCountdowns, 1000);
+        }
+
+        function updateCountdowns() {
+            const now = new Date();
+            
+            matchData.forEach(match => {
+                if (match.error || !match.date) return;
+                const el = document.getElementById(`timer-${match.id}`);
+                if (!el) return;
+                
+                const diff = match.date - now;
+                
+                if (diff <= 0) {
+                    el.innerText = 'MATCH LIVE';
+                    el.classList.replace('text-cyan-400', 'text-amber-400');
+                    el.classList.replace('bg-cyan-400/10', 'bg-amber-400/10');
+                    el.classList.remove('timer-glow');
+                    return;
+                }
+                
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const m = Math.floor((diff / 1000 / 60) % 60);
+                
+                el.innerText = `${d}D ${h}h ${m}'`;
+            });
+        }
+
+        fetchSchedules();
+        setInterval(fetchSchedules, 30 * 60 * 1000); 
+    </script>
+</body>
+</html>
