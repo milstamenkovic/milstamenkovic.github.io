@@ -4,8 +4,7 @@
 <!-- © 2026 Mil Stamenković -->
 <!-- Created with help of Free Gemini AI -->
 <!-- Направљено:  31.03.2026. - Ћуприја, Србија -->
-<!-- Преправљено: 31.03.2026. - Ћуприја, Србија -->
-<!-- Објављено:   31.03.2026. - Ћуприја, Србија -->
+<!-- Преправљено: 01.04.2026. - Ћуприја, Србија -->
 
 
 
@@ -69,14 +68,16 @@
         let matchData = [];
         let timerInterval = null;
 
-        // Formats date into "HH:MMh DD.MM.YYYY." (e.g., 20:45h 14.04.2026.)
+        // Formats date into "HH:MMh day - DD.MM.YYYY." (e.g., 20:45h дан - 14.04.2026.)
         function formatDateTime(dateObj) {
+            let dayName = dateObj.toLocaleDateString('sr', { weekday: 'short' });
+            dayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
             const d = dateObj.getDate().toString().padStart(2, '0');
             const m = (dateObj.getMonth() + 1).toString().padStart(2, '0');
             const y = dateObj.getFullYear();
             const hh = dateObj.getHours().toString().padStart(2, '0');
             const mm = dateObj.getMinutes().toString().padStart(2, '0');
-            return `${hh}:${mm}h - ${d}.${m}.${y}.`;
+            return `${hh}:${mm}h - ${dayName} ${d}.${m}.${y}.`;
         }
 
         async function fetchWithRetry(url, retries = 3, delay = 1000) {
@@ -169,7 +170,7 @@
             
             matchData.forEach((match, index) => {
                 const row = document.createElement('div');
-                row.className = `flex flex-col md:flex-row md:items-center md:justify-between p-3 rounded-lg transition-colors hover:bg-slate-700/30 gap-2 md:gap-4 border-b border-slate-700/30 w-full`;
+                row.className = `flex flex-col md:flex-row md:items-center md:justify-between p-3 rounded-lg transition-colors hover:bg-slate-700/30 gap-2 md:gap-1 border-b border-slate-700/30 w-full`;
                 
                 if (match.error) {
                     row.innerHTML = `
@@ -181,12 +182,12 @@
                 } else {
                     row.innerHTML = `
                         <!-- Game Details -->
-                        <div class="text-slate-200 font-medium tracking-wide text-[15px] flex-1 truncate mb-1 md:mb-0 md:pr-4">
+                        <div class="text-slate-200 font-medium tracking-wide text-[15px] flex-1 truncate mb-1 md:mb-0 md:pr-1">
                             ${match.home} <span class="text-slate-500 mx-1">:</span> ${match.away}
                         </div>
                         
                         <!-- Time and Date -->
-                        <div class="text-slate-400 font-mono text-sm whitespace-nowrap shrink-0 md:w-36 md:text-left mb-2 md:mb-0">
+                        <div class="text-slate-400 font-mono text-sm whitespace-nowrap shrink-0 md:w-48 md:text-left mb-2 md:mb-0">
                             ${formatDateTime(match.date)}
                         </div>
                         
