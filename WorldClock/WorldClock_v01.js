@@ -33,32 +33,32 @@ export default {
     });
 
     const totalW = 360;
-    const totalH = 1240;
+    const totalH = 1260;
 
     const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}" xmlns="http://www.w3.org/2000/svg">
-  <rect width="${totalW}" height="${totalH}" fill="none" rx="14"/>
+    <svg width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${totalW}" height="${totalH}" fill="none" rx="14"/>
 
-  <!-- Clocks -->
-  <g transform="translate(${totalW / 6}, 20)">${clocks[0]}</g>
-  <g transform="translate(${totalW / 6}, 300)">${clocks[1]}</g>
-  <g transform="translate(${totalW / 6}, 580)">${clocks[2]}</g>
-  <g transform="translate(${totalW / 6}, 860)">${clocks[3]}</g>
+      <!-- Clocks -->
+      <g transform="translate(${totalW / 6}, 20)">${clocks[0]}</g>
+      <g transform="translate(${totalW / 6}, 300)">${clocks[1]}</g>
+      <g transform="translate(${totalW / 6}, 580)">${clocks[2]}</g>
+      <g transform="translate(${totalW / 6}, 860)">${clocks[3]}</g>
 
-  <!-- Footer -->
-  <text x="${totalW / 2}" y="${totalH - 108}" text-anchor="middle" 
-      font-family="'Courier New',monospace" font-size="24" fill="#444" 
-      letter-spacing="1">
-    <tspan x="${totalW / 2}" dy="1em" fill="red">Освежите страницу</tspan>
-    <tspan x="${totalW / 2}" dy="1em" fill="red">како бисте видели</tspan>
-    <tspan x="${totalW / 2}" dy="1em" fill="red">тренутна времена</tspan>
-</text>
-<text x="${totalW / 2}" y="${totalH - 20}" text-anchor="middle" 
-      font-family="'Courier New',monospace" font-size="14" fill="#444" 
-      letter-spacing="1">
-    <tspan x="${totalW / 2}" dy="1em">Refresh page to see current times</tspan>
-</text>
-</svg>`;
+      <!-- Footer -->
+      <text x="${totalW / 2}" y="${totalH - 108}" text-anchor="middle" 
+          font-family="'Courier New',monospace" font-size="24" fill="#444" 
+          letter-spacing="1">
+        <tspan x="${totalW / 2}" dy="1em" fill="red">Освежите страницу</tspan>
+        <tspan x="${totalW / 2}" dy="1em" fill="red">како бисте видели</tspan>
+        <tspan x="${totalW / 2}" dy="1em" fill="red">тренутна времена</tspan>
+      </text>
+      <text x="${totalW / 2}" y="${totalH - 20}" text-anchor="middle" 
+          font-family="'Courier New',monospace" font-size="14" fill="#444" 
+          letter-spacing="1">
+        <tspan x="${totalW / 2}" dy="1em">Refresh page to see current times</tspan>
+      </text>
+    </svg>`;
 
     return new Response(svg, {
       headers: {
@@ -115,27 +115,27 @@ function renderClock(cityName, h, m, s) {
     .replace(/ć/g, '&#263;');
 
   return `
-<g transform="translate(120, 130)">
-  <!-- City label -->
-  <text x="0" y="-118" text-anchor="middle"
-    font-family="'Courier New',monospace" font-size="13" fill="#999"
-    letter-spacing="2">${safeName}</text>
-  <!-- Face -->
-  <circle r="100" fill="#111" stroke="#2a2a2a" stroke-width="1.5"/>
-  ${ticks}
-  ${nums}
-  <!-- Hour hand -->
-  <line x1="${H.x1}" y1="${H.y1}" x2="${H.x2}" y2="${H.y2}" stroke="#cccccc" stroke-width="4" stroke-linecap="round"/>
-  <!-- Minute hand -->
-  <line x1="${M.x1}" y1="${M.y1}" x2="${M.x2}" y2="${M.y2}" stroke="#aaaaaa" stroke-width="2.5" stroke-linecap="round"/>
-  <!-- Second hand -->
-  <line x1="${S.x1}" y1="${S.y1}" x2="${S.x2}" y2="${S.y2}" stroke="#c0392b" stroke-width="1.5" stroke-linecap="round"/>
-  <!-- Center -->
-  <circle r="4" fill="#c0392b"/>
-  <!-- Digital -->
-  <text x="0" y="118" text-anchor="middle"
-    font-family="'Courier New',monospace" font-size="13" fill="#888"
-    letter-spacing="2">${digitalTime}</text>
+  <g transform="translate(120, 130)">
+    <!-- City label -->
+    <text x="0" y="-118" text-anchor="middle"
+      font-family="'Courier New',monospace" font-size="14" font-weight="bold" fill="#000000"
+      letter-spacing="2">${safeName}</text>
+    <!-- Face -->
+    <circle r="100" fill="#111" stroke="#2a2a2a" stroke-width="1.5"/>
+    ${ticks}
+    ${nums}
+    <!-- Hour hand -->
+    <line x1="${H.x1}" y1="${H.y1}" x2="${H.x2}" y2="${H.y2}" stroke="#e0e0e0ff" stroke-width="4" stroke-linecap="round"/>
+    <!-- Minute hand -->
+    <line x1="${M.x1}" y1="${M.y1}" x2="${M.x2}" y2="${M.y2}" stroke="#bdbdbdff" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Second hand -->
+    <line x1="${S.x1}" y1="${S.y1}" x2="${S.x2}" y2="${S.y2}" stroke="#c0392b" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Center -->
+    <circle r="4" fill="#c0392b"/>
+    <!-- Digital -->
+    <text x="0" y="118" text-anchor="middle"
+      font-family="'Courier New',monospace" font-size="13" fill="000000" font-weight="bold"
+      letter-spacing="2" text-decoration="underline">${digitalTime}</text>
 </g>`;
 }
 
