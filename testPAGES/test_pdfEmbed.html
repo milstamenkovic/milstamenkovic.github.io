@@ -1,0 +1,70 @@
+<!-- Created: 19h14'03'' - 16.05.2026. - Ćuprija, Serbia - Mil Stamenković -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>test PDF Embed</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📃</text></svg>">
+</head>
+
+
+
+<style>
+
+body {
+	display: flex;
+	width: 100%;
+	gap: 1em;
+}
+
+h1 {
+	font-size: 1em;
+}
+
+.pdf {
+	flex: 2; /* 2/3 of screen */
+	/* width: 100%; */
+}
+
+.text {
+	flex: 1; /* 1/3 of screen */
+	/* width: 100%; */
+}
+
+@media (max-width: 640px) {
+  body {
+    flex-direction: column-reverse; /* Stacks them and puts RIGHT on top, LEFT on bottom */
+  }
+}
+
+.poster {
+	width: 100%;
+}
+
+</style>
+
+
+
+<body>
+
+
+	<!-- <iframe src="../Assets/documents/Rosemarys Baby.pdf" width="100%" height="800px"></iframe> -->
+
+	<div class="pdf">
+		<iframe src="../Assets/documents/Rosemarys Baby.pdf" width="100%" height="1000px"></iframe>
+	</div>
+
+	<div class="text">
+		<h1>Test for PDF document embeding / Тест за уметање "PDF" документа</h1>
+		<img src="https://m.media-amazon.com/images/M/MV5BZjllZTAxNjAtMDNiNi00NjczLWExNGYtM2U2MmM2ZWJjOWE0XkEyXkFqcGc@._V1_.jpg" alt="" class="poster">
+		<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum, necessitatibus tempora recusandae architecto cumque odit vel dolore quibusdam dolorum fuga? Quidem minima commodi exercitationem soluta, magni impedit natus quis quibusdam.</p>
+	</div>
+	
+</body>
+</html>
